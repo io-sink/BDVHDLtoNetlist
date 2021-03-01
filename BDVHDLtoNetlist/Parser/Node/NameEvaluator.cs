@@ -23,19 +23,16 @@ namespace BDVHDLtoNetlist.Parser.Node
             if(node.ChildNodes[0].Term.Name == "indexed_name")
             {
                 int index = (int)node.ChildNodes[0].ChildNodes[2].Token.Value;
-                return new StdLogic(new SignalName(baseName, index));
+                return new SignalName(baseName, index);
             }
             else if (node.ChildNodes[0].Term.Name == "slice_name")
             {
                 var range = (Tuple<int, int>)EvaluateGeneral(node.ChildNodes[0].ChildNodes[2]);
-                return new StdLogicVector(new SignalName(baseName), range.Item1, range.Item2);
+                return new SignalName(baseName, range.Item1, range.Item2);
             }
             else if (node.ChildNodes[0].Term.Name == "simple_name")
             {
-                if (this.utility.signalTable.ContainsKey(baseName))
-                    return this.utility.signalTable[baseName];
-                else
-                    return new StdLogic(new SignalName(baseName));
+                return new SignalName(baseName);
             }
 
             return null;

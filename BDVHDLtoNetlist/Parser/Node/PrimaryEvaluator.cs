@@ -19,7 +19,7 @@ namespace BDVHDLtoNetlist.Parser.Node
         public override object Evaluate(ParseTreeNode node)
         {
             if(node.ChildNodes.Count == 1)
-                return EvaluateGeneral(node.ChildNodes[0]);
+                return this.utility.signalTable.ResolveSignal((SignalName)EvaluateGeneral(node.ChildNodes[0]));
             else
                 return EvaluateGeneral(node.ChildNodes[1]);
         }

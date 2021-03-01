@@ -17,7 +17,9 @@ namespace BDVHDLtoNetlist.Parser.Node
 
         public override object Evaluate(ParseTreeNode node)
         {
-            var leftHandSide = (ISignal)EvaluateGeneral(node.ChildNodes[0]);
+            var leftHandSide = this.utility.signalTable.ResolveSignal(
+                (SignalName)EvaluateGeneral(node.ChildNodes[0]));
+
             var rightHandSide = (ISignal)EvaluateGeneral(node.ChildNodes[2]);
 
             this.utility.assignments.Add(new Tuple<ISignal, ISignal>(leftHandSide, rightHandSide));

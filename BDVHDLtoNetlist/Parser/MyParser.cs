@@ -52,6 +52,13 @@ namespace BDVHDLtoNetlist.Parser
                     Console.WriteLine("\t{0}", signal);
             }
 
+            foreach (var component in evaluator.utility.components)
+            {
+                Console.WriteLine("[COMPONENT] {0}: {1}", component.name, component.prototype.name);
+                foreach (var signal in component.portMap.Keys)
+                    Console.WriteLine("\t{0} -> {1}", signal, component.portMap[signal]);
+            }
+
             return true;
         }
 

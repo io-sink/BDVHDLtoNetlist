@@ -13,6 +13,27 @@ namespace BDVHDLtoNetlist.Parser.Utility
         { 
         }
 
+        public ISignal ResolveSignal(SignalName signalName)
+        {
+            if(!this.ContainsKey(signalName.baseName))
+            {
+                Console.Error.WriteLine("invalid signal: " + signalName.baseName);
+                return new StdLogic(signalName);
+            }
+
+            if(this[signalName] is StdLogic)
+                return new StdLogic(new SignalName(signalName.baseName));
+            else if(this[signalName] is StdLogicVector)
+            {
+                if (signalName.edIndex == null)
+                    return new StdLogic(new SignalName(signalName.baseName));
+                else
+                    return new StdLogicVector(new SignalName(signalName.baseName), (int)signalName.stIndex, (int)signalName.edIndex);
+            }
+
+            return null;
+        }
+
         public ISignal this[SignalName signalName]
         {
             get

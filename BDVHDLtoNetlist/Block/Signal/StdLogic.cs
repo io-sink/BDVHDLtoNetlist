@@ -20,10 +20,10 @@ namespace BDVHDLtoNetlist.Block.Signal
 
         public override bool Equals(object obj)
         {
-            if (obj == null || obj.GetType() != this.GetType())
+            if (obj == null || obj.GetType() != typeof(StdLogic))
                 return false;
             else
-                return this.name == ((StdLogic)obj).name;
+                return this.name.Equals(((StdLogic)obj).name);
         }
 
         public bool Assignable(ISignal other)

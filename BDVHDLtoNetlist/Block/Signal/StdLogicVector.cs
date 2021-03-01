@@ -35,7 +35,7 @@ namespace BDVHDLtoNetlist.Block.Signal
             if (obj == null || obj.GetType() != this.GetType())
                 return false;
             else
-                return this.name == ((StdLogicVector)obj).name &&
+                return this.name.Equals(((StdLogicVector)obj).name) &&
                     this.stRange == ((StdLogicVector)obj).stRange &&
                     this.size == ((StdLogicVector)obj).size;
         }
@@ -48,7 +48,7 @@ namespace BDVHDLtoNetlist.Block.Signal
 
         public override int GetHashCode()
         {
-            return this.name.GetHashCode() * 1024 + this.stRange.GetHashCode() * 32 + this.size.GetHashCode();
+            return this.name.GetHashCode() ^ this.stRange.GetHashCode() ^ this.size.GetHashCode();
         }
 
         public override string ToString()

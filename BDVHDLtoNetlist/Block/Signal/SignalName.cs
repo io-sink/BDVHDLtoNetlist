@@ -9,37 +9,24 @@ namespace BDVHDLtoNetlist.Block.Signal
     class SignalName
     {
         public string baseName { get; }
-        public int? index { get; }
+        public int? stIndex { get; }
+        public int? edIndex { get; }
 
-        public SignalName(string baseName, int? index = null)
+        public SignalName(string baseName, int? stIndex = null, int? edIndex = null)
         {
             this.baseName = baseName;
-            this.index = index;
-        }
-
-        public static SignalName Parse(string value)
-        {
-            string baseName;
-            int? index = null;
-
-            var indexMatch = System.Text.RegularExpressions.Regex.Match(value, @"\[\d+\]$");
-            if (indexMatch == null)
-                baseName = value;
-            else
-            {
-                baseName = value.Substring(0, value.Length - indexMatch.Value.Length);
-                index = int.Parse(indexMatch.Value.Trim("[]".ToCharArray()));
-            }
-
-            return new SignalName(baseName, index);
+            this.stIndex = stIndex;
+            this.edIndex = edIndex;
         }
 
         public override string ToString()
         {
-            if(index == null)
+            if(edIndex == null && stIndex == null)
                 return baseName;
+            else if(stIndex == null)
+                return string.Format("{0}[{1}]", baseName, stIndex);
             else
-                return string.Format("{0}[{1}]", baseName, index);
+                return string.Format("{0}[{1}..{2}]", baseName, stIndex, edIndex);
         }
 
         public override bool Equals(object obj)
@@ -48,12 +35,13 @@ namespace BDVHDLtoNetlist.Block.Signal
                 return false;
             else
                 return this.baseName == ((SignalName)obj).baseName &&
-                    this.index == ((SignalName)obj).index;
+                    this.stIndex == ((SignalName)obj).stIndex &&
+                    this.edIndex == ((SignalName)obj).edIndex;
         }
 
         public override int GetHashCode()
         {
-            return this.baseName.GetHashCode() * 32 + this.index.GetHashCode();
+            return this.baseName.GetHashCode() ^ this.stIndex.GetHashCode() ^ this.edIndex.GetHashCode();
         }
     }
 }

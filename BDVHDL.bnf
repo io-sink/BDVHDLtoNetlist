@@ -1,0 +1,125 @@
+(*
+[reserved]
+all
+entity
+is
+begin
+end
+generic
+port
+constant 
+signal
+variable
+file
+bus
+in
+out
+inout
+buffer
+linkage
+TO
+DOWNTO
+ARCHITECTURE
+OF
+ATTRIBUTE
+MAP
+AND
+OR
+XOR
+NAND
+NOR
+XNOR
+
+
+
+<=
+;
+.
+,
+
+
+[lexical]
+identifier : 名前
+
+
+*)
+
+
+design_file ::= design_unit   # 文法の開始記号
+design_unit ::= context_clause library_unit
+
+context_clause ::= { context_item }
+context_item ::= library_clause | use_clause
+library_clause ::= LIBRARY library_names ;    # library文
+library_names ::= library_name { , library_name }
+library_name ::= identifier
+use_clause ::= USE use_names ;    # use文
+use_names ::= use_name { , use_name }
+use_name ::= identifier_series [ . ALL ]
+identifier_series ::= identifier { . identifier }
+
+library_unit ::= entity_declaration | architecture_body
+
+
+entity_declaration ::=    # entity宣言
+  ENTITY identifier IS 
+  entity_header
+  END [ ENTITY ] [ identifier ] ;
+entity_header ::= [ generic_clause ] [ port_clause ]
+generic_clause ::= GENERIC ( interface_list ) ;   # generic宣言
+port_clause ::= PORT ( interface_list ) ;   # port宣言
+interface_list ::= object_declaration { ; object_declaration }
+object_declaration ::= [ object_type ] identifier_list : [ object_mode ] subtype_indication [ := expression ]
+object_type ::= ATTRIBUTE | CONSTANT | SIGNAL | VARIABLE | FILE
+identifier_list ::= identifier { , identifier }
+object_mode ::= IN | OUT | INOUT | BUFFER | LINKAGE
+subtype_indication ::= identifier [ ( range_constraint ) ]    # 型名
+range_constraint ::= NUMBER direction NUMBER
+direction ::= TO | DOWNTO
+
+
+architecture_body ::=    # architecture宣言
+  ARCHITECTURE identifier OF identifier IS
+    architecture_declarative_part
+  BEGIN
+    architecture_statement_part
+  END [ ARCHITECTURE ] [ identifier ] ;
+  
+architecture_declarative_part ::= { block_declarative_item }
+block_declarative_item ::= component_declaration
+                            | object_declaration
+                            | attribute_specification
+component_declaration ::=
+	COMPONENT identifier [ IS ]
+		[ generic_clause ]
+		[ port_clause ]
+	END COMPONENT [ identifier ] ;
+attribute_specification ::= ATTRIBUTE identifier OF identifier IS expression ;
+
+architecture_statement_part ::= { concurrent_statement } # architectureの内部
+concurrent_statement ::= concurrent_signal_assignment_statement
+	                        | component_instantiation_statement
+concurrent_signal_assignment_statement ::= name <= expression ;
+name ::= simple_name
+          | indexed_name
+          | slice_name
+simple_name ::= identifier
+indexed_name ::= identifier ( NUMBER )
+slice_name ::= identifier ( range_constraint )
+
+component_instantiation_statement ::= 
+  identifier : [ COMPONENT ] identifier [ generic_map_aspect ] [ port_map_aspect ] ;
+generic_map_aspect ::= GENERIC MAP ( association_list )
+association_list ::= association_element { , association_element }
+association_element ::= name => name
+port_map_aspect ::= PORT MAP ( association_list )
+
+expression ::= and_expression | or_expression | xor_expression | nand_expression | nor_expression | xnor_expression
+and_expression ::= factor { AND factor }
+or_expression ::= factor { OR factor }
+xor_expression ::= factor { XOR factor }
+nand_expression ::= factor { NAND factor }
+nor_expression ::= factor { NOR factor }
+xnor_expression ::= factor { XNOR factor }
+factor ::= primary | NOT primary
+primary ::= name | ( expression )

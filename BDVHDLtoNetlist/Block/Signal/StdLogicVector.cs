@@ -16,7 +16,7 @@ namespace BDVHDLtoNetlist.Block.Signal
 
         private StdLogic[] logic;
 
-        public StdLogic getLogic(int index) { return logic[index - stRange]; }
+        public StdLogic GetLogic(int index) { return logic[index - stRange]; }
 
         public StdLogicVector(SignalName name, int stRange, int edRange, SignalMode mode = SignalMode.NONE)
         {
@@ -27,7 +27,7 @@ namespace BDVHDLtoNetlist.Block.Signal
 
             logic = new StdLogic[this.size];
             for (int i = stRange; i <= edRange; ++i)
-                logic[i - stRange] = new StdLogic(new SignalName(name.baseName, stRange), mode);
+                logic[i - stRange] = new StdLogic(new SignalName(name.baseName, i), mode);
         }
 
         public override bool Equals(object obj)

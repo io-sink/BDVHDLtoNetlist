@@ -23,14 +23,14 @@ namespace BDVHDLtoNetlist.Parser.Utility
 
             if (this[signalName] is StdLogic)
             {
-                return new StdLogic(new SignalName(signalName.baseName));
+                return this[signalName];
             }
             else if (this[signalName] is StdLogicVector)
             {
                 if (signalName.stIndex == null && signalName.edIndex == null)
-                    return new StdLogic(new SignalName(signalName.baseName));
+                    return this[signalName];
                 else if (signalName.edIndex == null)
-                    return new StdLogic(new SignalName(signalName.baseName, (int)signalName.stIndex));
+                    return ((StdLogicVector)this[signalName]).GetLogic((int)signalName.stIndex);
                 else
                     return new StdLogicVector(new SignalName(signalName.baseName, (int)signalName.stIndex, (int)signalName.edIndex), 
                         0, (int)signalName.edIndex - (int)signalName.stIndex + 1);

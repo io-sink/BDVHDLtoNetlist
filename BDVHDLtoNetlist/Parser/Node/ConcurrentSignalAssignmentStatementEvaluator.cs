@@ -22,6 +22,9 @@ namespace BDVHDLtoNetlist.Parser.Node
 
             var rightHandSide = (ISignal)EvaluateGeneral(node.ChildNodes[2]);
 
+            Console.WriteLine(leftHandSide);
+            Console.WriteLine(rightHandSide);
+
             this.utility.assignments.Add(new Tuple<ISignal, ISignal>(leftHandSide, rightHandSide));
             return null;
         }

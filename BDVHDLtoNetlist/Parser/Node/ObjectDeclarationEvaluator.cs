@@ -22,9 +22,11 @@ namespace BDVHDLtoNetlist.Parser.Node
             var signalNames = new List<string>();
 
             foreach (var childNode in node.ChildNodes)
-                if (childNode.Term.Name == "object_type")
+            {
+                if (childNode.ChildNodes.Count > 0 && childNode.ChildNodes[0].Term.Name == "object_type")
                 {
-                    string signalType = childNode.ChildNodes[0].Token.Text.ToLower();
+                    string signalType = childNode.ChildNodes[0].ChildNodes[0].Token.Text.ToLower();
+
                     if (signalType != "signal")
                         return signals;
                 }
@@ -34,27 +36,28 @@ namespace BDVHDLtoNetlist.Parser.Node
                         if (gchildNode.Term.Name == "identifier")
                             signalNames.Add(gchildNode.Token.Text);
                 }
-                else if (childNode.Term.Name == "object_mode")
+                else if (childNode.ChildNodes.Count > 0 && childNode.ChildNodes[0].Term.Name == "object_mode")
                 {
-                    signalMode = (SignalMode)Enum.Parse(typeof(SignalMode), childNode.ChildNodes[0].Token.Text, true);
+                    signalMode = (SignalMode)Enum.Parse(typeof(SignalMode), childNode.ChildNodes[0].ChildNodes[0].Token.Text, true);
                 }
                 else if (childNode.Term.Name == "subtype_indication")
                 {
 
                     if (childNode.ChildNodes[0].Token.Text.ToLower() == "std_logic")
                     {
-                        signals.AddRange(signalNames.Select(x => 
+                        signals.AddRange(signalNames.Select(x =>
                             new StdLogic(new SignalName(x), signalMode)));
                     }
                     else if (childNode.ChildNodes[0].Token.Text.ToLower() == "std_logic_vector")
                     {
-                        var range = (Tuple<int, int>)EvaluateGeneral(childNode.ChildNodes[1].ChildNodes[0].ChildNodes[1]);
+                        var range = (Tuple<int, int>)EvaluateGeneral(childNode.ChildNodes[1].ChildNodes[1]);
 
                         signals.AddRange(signalNames.Select(x =>
                                 new StdLogicVector(new SignalName(x), range.Item1, range.Item2, signalMode)));
                     }
 
                 }
+            }
 
             return signals;
         }

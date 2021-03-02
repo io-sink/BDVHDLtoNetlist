@@ -16,8 +16,11 @@ namespace BDVHDLtoNetlist.Parser
 
         public bool Parse(string program)
         {
-            var parser = new Irony.Parsing.Parser(new BDVHDLGrammar());
+            var grammar = new BDVHDLGrammar();
+            var parser = new Irony.Parsing.Parser(grammar);
             var ast = parser.Parse(program);
+
+            (new TreeConverter()).Convert(ast, grammar);
 
 
             Console.WriteLine(ast.Status);

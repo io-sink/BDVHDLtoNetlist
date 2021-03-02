@@ -27,7 +27,7 @@ namespace BDVHDLtoNetlist.Parser.Node
             var componentPrototype = this.utility.componentDeclarations[componentPrototypeName];
             var portMap = new Dictionary<ISignal, ISignal>();
 
-            var associationListNode = node.ChildNodes[5].ChildNodes[0].ChildNodes[0].ChildNodes[3];
+            var associationListNode = node.ChildNodes[5].ChildNodes[0].ChildNodes[3];
             foreach(var associationElementNode in associationListNode.ChildNodes)
             {
                 var leftHandSide = componentPrototype.signals.ResolveSignal(

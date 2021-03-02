@@ -76,6 +76,7 @@
     <Compile Include="Parser\Node\ObjectDeclarationEvaluator.cs" />
     <Compile Include="Parser\Node\PrimaryEvaluator.cs" />
     <Compile Include="Parser\Node\RangeConstraintEvaluator.cs" />
+    <Compile Include="Parser\TreeConverter.cs" />
     <Compile Include="Parser\Utility\SignalNameGenerator.cs" />
     <Compile Include="Parser\Utility\SignalTable.cs" />
     <Compile Include="Parser\Utility\UtilityContainer.cs" />

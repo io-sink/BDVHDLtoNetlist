@@ -117,12 +117,11 @@ namespace BDVHDLtoNetlist.Parser
             KeyTerm sXnor = ToTerm("xnor");
             KeyTerm sXor = ToTerm("xor");
 
-            NumberLiteral sNumber = new NumberLiteral("number");
-            IdentifierTerminal sIdentifier = new IdentifierTerminal("identifier", "\\_", "\\_0123456789");
-
-            // コメント
             var comment = new CommentTerminal("comment", "--", "\n", "\r\n");
             NonGrammarTerminals.Add(comment);
+
+            NumberLiteral sNumber = new NumberLiteral("number");
+            IdentifierTerminal sIdentifier = new IdentifierTerminal("identifier", "\\_", "\\_0123456789");
 
             NonTerminal designFile = new NonTerminal("design_file");
             NonTerminal designUnit = new NonTerminal("design_unit");

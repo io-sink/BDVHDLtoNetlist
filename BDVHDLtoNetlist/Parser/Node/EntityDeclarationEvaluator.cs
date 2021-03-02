@@ -21,7 +21,7 @@ namespace BDVHDLtoNetlist.Parser.Node
             string entityName = node.ChildNodes[1].Token.Text;
             var portSignals = new SignalTable();
 
-            var portClauseNode = node.ChildNodes[3].ChildNodes[1].ChildNodes[0].ChildNodes[0];
+            var portClauseNode = node.ChildNodes[3].ChildNodes[1].ChildNodes[0];
             foreach (var objectDeclarationNode in portClauseNode.ChildNodes[2].ChildNodes)
             {
                 var signals = (List<ISignal>)EvaluateGeneral(objectDeclarationNode);

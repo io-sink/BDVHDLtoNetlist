@@ -23,6 +23,7 @@ namespace BDVHDLtoNetlist.Parser.Node
             if(node.ChildNodes[0].Term.Name == "indexed_name")
             {
                 int index = (int)node.ChildNodes[0].ChildNodes[2].Token.Value;
+
                 return new SignalName(baseName, index);
             }
             else if (node.ChildNodes[0].Term.Name == "slice_name")

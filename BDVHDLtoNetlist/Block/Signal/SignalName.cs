@@ -23,7 +23,7 @@ namespace BDVHDLtoNetlist.Block.Signal
         {
             if(edIndex == null && stIndex == null)
                 return baseName;
-            else if(stIndex == null)
+            else if(edIndex == null)
                 return string.Format("{0}[{1}]", baseName, stIndex);
             else
                 return string.Format("{0}[{1}..{2}]", baseName, stIndex, edIndex);

@@ -12,7 +12,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class ComponentInstatiationStatementEvaluator : NodeEvaluator
     {
-        public ComponentInstatiationStatementEvaluator(UtilityContainer utility) : base(utility)
+        public ComponentInstatiationStatementEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
@@ -21,10 +21,10 @@ namespace BDVHDLtoNetlist.Parser.Node
             string componentName = node.ChildNodes[0].Token.Text;
             string componentPrototypeName = node.ChildNodes[3].Token.Text;
 
-            if (!this.utility.componentDeclarations.ContainsKey(componentPrototypeName))
+            if (!this.declaredObjects.componentDeclarations.ContainsKey(componentPrototypeName))
                 throw new Exception("Invalid component: " + componentPrototypeName);
 
-            var componentPrototype = this.utility.componentDeclarations[componentPrototypeName];
+            var componentPrototype = this.declaredObjects.componentDeclarations[componentPrototypeName];
             var portMap = new Dictionary<ISignal, ISignal>();
 
             var associationListNode = node.ChildNodes[5].ChildNodes[0].ChildNodes[3];
@@ -32,14 +32,14 @@ namespace BDVHDLtoNetlist.Parser.Node
             {
                 var leftHandSide = componentPrototype.signals.ResolveSignal(
                     (SignalName)EvaluateGeneral(associationElementNode.ChildNodes[0]));
-                var rightHandSide = this.utility.signalTable.ResolveSignal(
+                var rightHandSide = this.declaredObjects.signalTable.ResolveSignal(
                     (SignalName)EvaluateGeneral(associationElementNode.ChildNodes[2]));
 
                 portMap[leftHandSide] = rightHandSide;
             }
 
             var component = new Component(componentName, componentPrototype, portMap);
-            this.utility.components.Add(component);
+            this.declaredObjects.components.Add(component);
 
             return null;
         }

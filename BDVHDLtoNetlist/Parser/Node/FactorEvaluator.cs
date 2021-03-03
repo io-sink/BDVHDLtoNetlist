@@ -12,7 +12,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class FactorEvaluator : NodeEvaluator
     {
-        public FactorEvaluator(UtilityContainer utility) : base(utility)
+        public FactorEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
@@ -20,13 +20,17 @@ namespace BDVHDLtoNetlist.Parser.Node
         {
             if (node.ChildNodes[0].Term.Name == "not")
             {
-                var newSignalName = this.utility.signalNameGenerator.getSignalName();
+                var primary = EvaluateGeneral(node.ChildNodes[1]);
+                if (!(primary is ISignal))
+                    throw new Exception("unsupported operation");
+
+                var inputSignal = (ISignal)primary;
+
+                var newSignalName = this.declaredObjects.signalNameGenerator.getSignalName();
                 var newSignal = new StdLogic(newSignalName);
 
-                var inputSignal = (ISignal)EvaluateGeneral(node.ChildNodes[1]);
-
                 var notGate = new LogicGate(LogicGate.GateType.NOT, new List<ISignal> { inputSignal }, newSignal);
-                this.utility.logicGates.Add(notGate);
+                this.declaredObjects.logicGates.Add(notGate);
 
                 return newSignal;
             }

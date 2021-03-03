@@ -11,7 +11,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class ObjectDeclarationEvaluator : NodeEvaluator
     {
-        public ObjectDeclarationEvaluator(UtilityContainer utility) : base(utility)
+        public ObjectDeclarationEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 

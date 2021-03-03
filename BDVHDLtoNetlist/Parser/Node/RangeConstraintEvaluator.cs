@@ -10,7 +10,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class RangeConstraintEvaluator : NodeEvaluator
     {
-        public RangeConstraintEvaluator(UtilityContainer utility) : base(utility)
+        public RangeConstraintEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 

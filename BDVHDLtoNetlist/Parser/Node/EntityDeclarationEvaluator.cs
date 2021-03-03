@@ -12,7 +12,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class EntityDeclarationEvaluator : NodeEvaluator
     {
-        public EntityDeclarationEvaluator(UtilityContainer utility) : base(utility)
+        public EntityDeclarationEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
@@ -22,19 +22,30 @@ namespace BDVHDLtoNetlist.Parser.Node
             var portSignals = new SignalTable();
 
             var portClauseNode = node.ChildNodes[3].ChildNodes[1].ChildNodes[0];
-            foreach (var objectDeclarationNode in portClauseNode.ChildNodes[2].ChildNodes)
-            {
-                var signals = (List<ISignal>)EvaluateGeneral(objectDeclarationNode);
 
-                foreach (var signal in signals)
+            foreach (var declarationNode in portClauseNode.ChildNodes[2].ChildNodes)
+                if (declarationNode.ChildNodes[0].Term.Name == "object_declaration")
                 {
-                    portSignals[signal.name] = signal;
-                    this.utility.signalTable[signal.name] = signal;
+                    var signals = (List<ISignal>)EvaluateGeneral(declarationNode.ChildNodes[0]);
+                    foreach (var signal in signals)
+                    {
+                        portSignals[signal.name] = signal;
+                        this.declaredObjects.signalTable[signal.name] = signal;
+                    }
                 }
-            }
+                else if (declarationNode.ChildNodes[0].Term.Name == "attribute_specification")
+                {
+                    var attribute = EvaluateGeneral(declarationNode.ChildNodes[0]);
+                    if (attribute != null)
+                    {
+                        var pair = (KeyValuePair<Tuple<string, string>, object>)attribute;
+                        portSignals[pair.Key.Item1].attribute[pair.Key.Item2] = pair.Value;
+                    }
+                }
+
 
             var entity = new ComponentPrototype(entityName, portSignals);
-            this.utility.componentDeclarations[entityName] = entity;
+            this.declaredObjects.componentDeclarations[entityName] = entity;
             return entity;
         }
     }

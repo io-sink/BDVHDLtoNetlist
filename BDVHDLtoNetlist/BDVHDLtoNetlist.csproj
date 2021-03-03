@@ -57,11 +57,15 @@
     <Compile Include="Block\Component\Component.cs" />
     <Compile Include="Block\Component\ComponentPrototype.cs" />
     <Compile Include="Block\Gate\LogicGate.cs" />
+    <Compile Include="Block\Library\IChip.cs" />
+    <Compile Include="Block\Library\ComponentChip.cs" />
+    <Compile Include="Block\Library\GateChip.cs" />
     <Compile Include="Block\Signal\ISignal.cs" />
     <Compile Include="Block\Signal\SignalName.cs" />
     <Compile Include="Block\Signal\StdLogic.cs" />
     <Compile Include="Block\Signal\StdLogicVector.cs" />
     <Compile Include="Parser\Node\ArchitectureDeclarativePartEvaluator.cs" />
+    <Compile Include="Parser\Node\AttributeSpecificationEvaluator.cs" />
     <Compile Include="Parser\Node\ComponentDeclarationEvaluator.cs" />
     <Compile Include="Parser\Node\ComponentInstatiationStatementEvaluator.cs" />
     <Compile Include="Parser\Node\ConcurrentSignalAssignmentStatementEvaluator.cs" />
@@ -79,7 +83,7 @@
     <Compile Include="Parser\TreeConverter.cs" />
     <Compile Include="Parser\Utility\SignalNameGenerator.cs" />
     <Compile Include="Parser\Utility\SignalTable.cs" />
-    <Compile Include="Parser\Utility\UtilityContainer.cs" />
+    <Compile Include="Parser\Utility\DeclaredObjectContainer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

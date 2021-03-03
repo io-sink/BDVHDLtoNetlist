@@ -13,6 +13,8 @@ namespace BDVHDLtoNetlist.Block.Signal
         SignalName name { get; }
         
         bool Assignable(ISignal other);
+
+        Dictionary<string, object> attribute { get; }
     }
 
     public enum SignalMode

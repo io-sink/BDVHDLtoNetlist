@@ -33,7 +33,7 @@ namespace BDVHDLtoNetlist.Parser.Utility
                     return ((StdLogicVector)this[signalName]).GetLogic((int)signalName.stIndex);
                 else
                     return new StdLogicVector(new SignalName(signalName.baseName, (int)signalName.stIndex, (int)signalName.edIndex), 
-                        0, (int)signalName.edIndex - (int)signalName.stIndex + 1);
+                        0, (int)signalName.edIndex - (int)signalName.stIndex + 1, this[signalName].mode);
             }
 
             return null;

@@ -13,11 +13,12 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class NodeEvaluator
     {
-        public UtilityContainer utility;
+        public DeclaredObjectContainer declaredObjects;
         private static Dictionary<string, Type> evaluatorTypes = new Dictionary<string, Type>()
         {
             { "entity_declaration", typeof(EntityDeclarationEvaluator) },
 
+            { "attribute_specification", typeof(AttributeSpecificationEvaluator) },
             { "architecture_declarative_part", typeof(ArchitectureDeclarativePartEvaluator) },
             { "component_declaration", typeof(ComponentDeclarationEvaluator) },
             { "object_declaration", typeof(ObjectDeclarationEvaluator) },
@@ -34,12 +35,17 @@ namespace BDVHDLtoNetlist.Parser.Node
             { "component_instantiation_statement", typeof(ComponentInstatiationStatementEvaluator) },
         };
 
-        public NodeEvaluator(UtilityContainer utility = null)
+        public NodeEvaluator(DeclaredObjectContainer utility = null)
         {
-            this.utility = utility == null ? new UtilityContainer() : utility;
+            this.declaredObjects = utility == null ? new DeclaredObjectContainer() : utility;
         }
 
         public virtual object Evaluate(ParseTreeNode node)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual object EvaluateDefault(ParseTreeNode node)
         {
             foreach (var childNode in node.ChildNodes)
                 EvaluateGeneral(childNode);
@@ -50,11 +56,11 @@ namespace BDVHDLtoNetlist.Parser.Node
         {
             if (evaluatorTypes.ContainsKey(node.Term.Name))
             {
-                var selectedEvaluator = (NodeEvaluator)Activator.CreateInstance(evaluatorTypes[node.Term.Name], this.utility);
+                var selectedEvaluator = (NodeEvaluator)Activator.CreateInstance(evaluatorTypes[node.Term.Name], this.declaredObjects);
                 return selectedEvaluator.Evaluate(node);
             }
             else
-                return this.Evaluate(node);
+                return this.EvaluateDefault(node);
         }
 
     }

@@ -11,7 +11,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class ArchitectureDeclarativePartEvaluator : NodeEvaluator
     {
-        public ArchitectureDeclarativePartEvaluator(UtilityContainer utility) : base(utility)
+        public ArchitectureDeclarativePartEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
@@ -23,7 +23,7 @@ namespace BDVHDLtoNetlist.Parser.Node
                     var signals = (List<ISignal>)EvaluateGeneral(childNode.ChildNodes[0]);
 
                     foreach (var signal in signals)
-                        this.utility.signalTable[signal.name] = signal;
+                        this.declaredObjects.signalTable[signal.name] = signal;
                 }
                 else
                 {

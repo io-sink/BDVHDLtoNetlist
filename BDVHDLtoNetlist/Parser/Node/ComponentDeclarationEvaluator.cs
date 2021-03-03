@@ -12,7 +12,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class ComponentDeclarationEvaluator : NodeEvaluator
     {
-        public ComponentDeclarationEvaluator(UtilityContainer utility) : base(utility)
+        public ComponentDeclarationEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
@@ -22,16 +22,18 @@ namespace BDVHDLtoNetlist.Parser.Node
             var portSignals = new SignalTable();
 
             var portClauseNode = node.ChildNodes[4].ChildNodes[0];
-            foreach (var objectDeclarationNode in portClauseNode.ChildNodes[2].ChildNodes)
+            foreach (var declarationNode in portClauseNode.ChildNodes[2].ChildNodes)
             {
-                var signals = (List<ISignal>)EvaluateGeneral(objectDeclarationNode);
-
-                foreach (var signal in signals)
-                    portSignals[signal.name] = signal;
+                if (declarationNode.ChildNodes[0].Term.Name == "object_declaration")
+                {
+                    var signals = (List<ISignal>)EvaluateGeneral(declarationNode.ChildNodes[0]);
+                    foreach (var signal in signals)
+                        portSignals[signal.name] = signal;
+                }
             }
 
             var entity = new ComponentPrototype(entityName, portSignals);
-            this.utility.componentDeclarations[entityName] = entity;
+            this.declaredObjects.componentDeclarations[entityName] = entity;
             return entity;
         }
     }

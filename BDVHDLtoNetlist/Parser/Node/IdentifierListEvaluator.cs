@@ -10,7 +10,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class IdentifierListEvaluator : NodeEvaluator
     {
-        public IdentifierListEvaluator(UtilityContainer utility) : base(utility)
+        public IdentifierListEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 

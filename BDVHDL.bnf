@@ -68,7 +68,16 @@ entity_declaration ::=    # entity宣言
 entity_header ::= [ generic_clause ] [ port_clause ]
 generic_clause ::= GENERIC ( interface_list ) ;   # generic宣言
 port_clause ::= PORT ( interface_list ) ;   # port宣言
-interface_list ::= object_declaration { ; object_declaration }
+interface_list ::= declaration { ; declaration }
+
+
+declaration ::= object_declaration
+                | attribute_declaration
+                | attribute_specification
+
+attribute_declaration ::= ATTRIBUTE identifier : subtype_indication
+attribute_specification ::= ATTRIBUTE identifier OF identifier IS expression
+
 object_declaration ::= [ object_type ] identifier_list : [ object_mode ] subtype_indication [ := expression ]
 object_type ::= ATTRIBUTE | CONSTANT | SIGNAL | VARIABLE | FILE
 identifier_list ::= identifier { , identifier }
@@ -87,14 +96,15 @@ architecture_body ::=    # architecture宣言
   
 architecture_declarative_part ::= { block_declarative_item }
 block_declarative_item ::= component_declaration
-                            | object_declaration
-                            | attribute_specification
+                            | object_declaration ;
+                            | attribute_declaration ;
+                            | attribute_specification ;
 component_declaration ::=
 	COMPONENT identifier [ IS ]
 		[ generic_clause ]
 		[ port_clause ]
 	END COMPONENT [ identifier ] ;
-attribute_specification ::= ATTRIBUTE identifier OF identifier IS expression ;
+
 
 architecture_statement_part ::= { concurrent_statement } # architectureの内部
 concurrent_statement ::= concurrent_signal_assignment_statement
@@ -122,4 +132,4 @@ nand_expression ::= factor { NAND factor }
 nor_expression ::= factor { NOR factor }
 xnor_expression ::= factor { XNOR factor }
 factor ::= primary | NOT primary
-primary ::= name | ( expression )
+primary ::= name | NUMBER | STRING | ( expression )

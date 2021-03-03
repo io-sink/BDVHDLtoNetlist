@@ -121,7 +121,12 @@ namespace BDVHDLtoNetlist.Parser
             NonGrammarTerminals.Add(comment);
 
             NumberLiteral sNumber = new NumberLiteral("number");
+            sNumber.Priority = 1;   // identifierよりも先も評価
+
             IdentifierTerminal sIdentifier = new IdentifierTerminal("identifier", "\\_", "\\_0123456789");
+
+            StringLiteral sString = new StringLiteral("string", "\"");
+
 
             NonTerminal designFile = new NonTerminal("design_file");
             NonTerminal designUnit = new NonTerminal("design_unit");
@@ -142,6 +147,9 @@ namespace BDVHDLtoNetlist.Parser
             NonTerminal genericClause = new NonTerminal("generic_clause");
             NonTerminal portClause = new NonTerminal("port_clause");
             NonTerminal interfaceList = new NonTerminal("interface_list");
+            NonTerminal declaration = new NonTerminal("declaration");
+            NonTerminal attributeDeclaration = new NonTerminal("attribute_declaration");
+            NonTerminal attributeSpecification = new NonTerminal("attribute_specification");
             NonTerminal objectDeclaration = new NonTerminal("object_declaration");
             NonTerminal objectType = new NonTerminal("object_type");
             NonTerminal identifierList = new NonTerminal("identifier_list");
@@ -154,7 +162,6 @@ namespace BDVHDLtoNetlist.Parser
             NonTerminal architectureDeclarativePart = new NonTerminal("architecture_declarative_part");
             NonTerminal blockDeclarativeItem = new NonTerminal("block_declarative_item");
             NonTerminal componentDeclaration = new NonTerminal("component_declaration");
-            NonTerminal attributeSpecification = new NonTerminal("attribute_specification");
 
             NonTerminal architectureStatementPart = new NonTerminal("architecture_statement_part");
             NonTerminal concurrentStatement = new NonTerminal("concurrent_statement");
@@ -207,7 +214,11 @@ namespace BDVHDLtoNetlist.Parser
             entityHeader.Rule = genericClause.Q() + portClause.Q();
             genericClause.Rule = sGeneric + sLParen + interfaceList + sRParen + sSemicolon;
             portClause.Rule = sPort + sLParen + interfaceList + sRParen + sSemicolon;
-            interfaceList.Rule = MakePlusRule(interfaceList, sSemicolon, objectDeclaration);
+            interfaceList.Rule = MakePlusRule(interfaceList, sSemicolon, declaration);
+
+            declaration.Rule = objectDeclaration | attributeDeclaration | attributeSpecification;
+            attributeDeclaration.Rule = sAttribute + sIdentifier + sColon + subtypeIndication;
+            attributeSpecification.Rule = sAttribute + sIdentifier + sOf + sIdentifier + sIs + expression;
             objectDeclaration.Rule = objectType.Q() + identifierList + sColon + objectMode.Q() + subtypeIndication + (sSeqAssign + expression).Q();
 
             objectType.Rule = sAttribute | sConstant | sSignal | sVariable | sFile;
@@ -224,13 +235,12 @@ namespace BDVHDLtoNetlist.Parser
                 architectureStatementPart +
                 sEnd + sArchitecture.Q() + sIdentifier.Q() + sSemicolon;
             architectureDeclarativePart.Rule = MakeStarRule(architectureDeclarativePart, blockDeclarativeItem);
-            blockDeclarativeItem.Rule = componentDeclaration | objectDeclaration + sSemicolon | attributeSpecification;
+            blockDeclarativeItem.Rule = componentDeclaration | objectDeclaration + sSemicolon | attributeDeclaration + sSemicolon | attributeSpecification + sSemicolon;
             componentDeclaration.Rule =
                 sComponent + sIdentifier + sIs.Q() +
                 genericClause.Q() +
                 portClause.Q() +
                 sEnd + sComponent + sIdentifier.Q() + sSemicolon;
-            attributeSpecification.Rule = sAttribute + sIdentifier + sOf + sIdentifier + sIs + expression + sSemicolon;
 
             architectureStatementPart.Rule = MakeStarRule(architectureStatementPart, concurrentStatement);
             concurrentStatement.Rule = concurrentSignalAssignmentStatement | componentInstatiationStatement;
@@ -254,7 +264,7 @@ namespace BDVHDLtoNetlist.Parser
             norExpression.Rule = MakePlusRule(norExpression, sNor, factor);
             xnorExpression.Rule = MakePlusRule(xnorExpression, sXnor, factor);
             factor.Rule = primary | sNot + primary;
-            primary.Rule = name | sLParen + expression + sRParen;
+            primary.Rule = name | sNumber | sString | sLParen + expression + sRParen;
 
 
             Root = designFile;

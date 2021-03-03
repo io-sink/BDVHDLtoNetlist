@@ -11,21 +11,22 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class ConcurrentSignalAssignmentStatementEvaluator : NodeEvaluator
     {
-        public ConcurrentSignalAssignmentStatementEvaluator(UtilityContainer utility) : base(utility)
+        public ConcurrentSignalAssignmentStatementEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
         public override object Evaluate(ParseTreeNode node)
         {
-            var leftHandSide = this.utility.signalTable.ResolveSignal(
+            var leftHandSide = this.declaredObjects.signalTable.ResolveSignal(
                 (SignalName)EvaluateGeneral(node.ChildNodes[0]));
 
-            var rightHandSide = (ISignal)EvaluateGeneral(node.ChildNodes[2]);
+            var expression = EvaluateGeneral(node.ChildNodes[2]);
+            if (!(expression is ISignal))
+                throw new Exception("unsupported operation");
 
-            Console.WriteLine(leftHandSide);
-            Console.WriteLine(rightHandSide);
+            var rightHandSide = (ISignal)expression;
 
-            this.utility.assignments.Add(new Tuple<ISignal, ISignal>(leftHandSide, rightHandSide));
+            this.declaredObjects.assignments.Add(new KeyValuePair<ISignal, ISignal>(leftHandSide, rightHandSide));
             return null;
         }
     }

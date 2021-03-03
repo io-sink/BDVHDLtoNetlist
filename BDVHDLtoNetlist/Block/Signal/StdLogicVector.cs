@@ -14,6 +14,8 @@ namespace BDVHDLtoNetlist.Block.Signal
         public int stRange { get; }
         public int size { get; }
 
+        public Dictionary<string, object> attribute { get; }
+
         private StdLogic[] logic;
 
         public StdLogic GetLogic(int index) { return logic[index - stRange]; }
@@ -28,6 +30,8 @@ namespace BDVHDLtoNetlist.Block.Signal
             logic = new StdLogic[this.size];
             for (int i = stRange; i <= edRange; ++i)
                 logic[i - stRange] = new StdLogic(new SignalName(name.baseName, i), mode);
+
+            this.attribute = new Dictionary<string, object>();
         }
 
         public override bool Equals(object obj)
@@ -53,7 +57,11 @@ namespace BDVHDLtoNetlist.Block.Signal
 
         public override string ToString()
         {
-            return string.Format("{0}: std_logic_vector[{1}..{2}] ({3})", name, stRange, size, mode);
+            string res = string.Format("{0}: std_logic_vector[{1}..{2}]({3}, ", name, stRange, size, mode);
+            foreach (var pair in this.attribute)
+                res += string.Format("{0} = {1}, ", pair.Key, pair.Value);
+            res += ")";
+            return res;
         }
     }
 }

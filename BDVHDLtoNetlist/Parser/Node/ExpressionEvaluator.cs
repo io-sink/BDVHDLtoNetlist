@@ -12,7 +12,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 {
     class ExpressionEvaluator : NodeEvaluator
     {
-        public ExpressionEvaluator(UtilityContainer utility) : base(utility)
+        public ExpressionEvaluator(DeclaredObjectContainer utility) : base(utility)
         {
         }
 
@@ -22,25 +22,30 @@ namespace BDVHDLtoNetlist.Parser.Node
             {
                 return EvaluateGeneral(node.ChildNodes[0].ChildNodes[0]);
             }
-            else if (node.ChildNodes[0].Term.Name == "and_expression")
+            else
             {
-                var gateType = (LogicGate.GateType)Enum.Parse(typeof(LogicGate.GateType), 
-                    node.ChildNodes[0].Term.Name.Split('_')[0], true);
-
-                var newSignalName = this.utility.signalNameGenerator.getSignalName();
-                var newSignal = new StdLogic(newSignalName);
-
                 var inputSignals = new List<ISignal>();
                 foreach (var factorNode in node.ChildNodes[0].ChildNodes)
-                    inputSignals.Add((ISignal)EvaluateGeneral(factorNode));
+                {
+                    var factor = EvaluateGeneral(factorNode);
+                    if (!(factor is ISignal))
+                        throw new Exception("unsupported operation");
+
+                    inputSignals.Add((ISignal)factor);
+                }
+
+                var gateType = (LogicGate.GateType)Enum.Parse(typeof(LogicGate.GateType),
+                    node.ChildNodes[0].Term.Name.Split('_')[0], true);
+
+                var newSignalName = this.declaredObjects.signalNameGenerator.getSignalName();
+                var newSignal = new StdLogic(newSignalName);
 
                 var logicGate = new LogicGate(gateType, inputSignals, newSignal);
-                this.utility.logicGates.Add(logicGate);
+                this.declaredObjects.logicGates.Add(logicGate);
 
                 return newSignal;
             }
 
-            return null;
         }
     }
 }

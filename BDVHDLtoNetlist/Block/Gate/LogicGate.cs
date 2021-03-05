@@ -17,7 +17,7 @@ namespace BDVHDLtoNetlist.Block.Gate
         private static int gateCount = 0;
 
         public string name { get; }
-        public GateType gateType { get; }
+        public GateType gateType { get; set; }
 
         public List<ISignal> inputSignals { get; }
         public ISignal outputSignal { get; }
@@ -42,5 +42,6 @@ namespace BDVHDLtoNetlist.Block.Gate
         {
             return this.name.GetHashCode();
         }
+
     }
 }

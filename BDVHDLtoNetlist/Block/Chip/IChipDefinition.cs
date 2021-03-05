@@ -5,15 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BDVHDLtoNetlist.Block.Library
+namespace BDVHDLtoNetlist.Block.Chip
 {
-    interface IChip
+    interface IChipDefinition
     {
         // ゲートのシグナル -> チップのピン
         Dictionary<ISignal, ISignal>[] portNameMappings { get; }
-
         // チップのピン -> 信号名
         Dictionary<ISignal, SignalName> constAssignMappings { get; }
+
+        Dictionary<string, object> chipAttribute { get; }
 
     }
 }

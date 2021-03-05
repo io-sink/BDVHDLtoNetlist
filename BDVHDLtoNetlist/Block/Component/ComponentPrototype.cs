@@ -18,5 +18,24 @@ namespace BDVHDLtoNetlist.Block.Component
             this.name = name;
             this.signals = signals;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != typeof(ComponentPrototype))
+                return false;
+            else
+            {
+                var foreignSignals = ((ComponentPrototype)obj).signals;
+                return this.name == ((ComponentPrototype)obj).name &&
+                        this.signals.Count == foreignSignals.Count && 
+                        !this.signals.Except(foreignSignals).Any();
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return this.signals.Aggregate(this.name.GetHashCode(), (y, x) => y ^ x.Key.GetHashCode() ^ x.Value.GetHashCode());
+        }
+
     }
 }

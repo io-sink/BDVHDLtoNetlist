@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace BDVHDLtoNetlist.Parser.Utility
 {
-    class SignalNameGenerator
+    class TempSignalNameGenerator
     {
         private int signalCount = 0;
         public SignalName getSignalName()
         {
-            return new SignalName(".tmp_signal" + ++signalCount);
+            var tempSignal = new SignalName(".tmp_signal" + ++signalCount);
+            tempSignal.SetTemp();
+
+            return tempSignal;
         }
     }
 

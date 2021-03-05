@@ -20,6 +20,7 @@ namespace BDVHDLtoNetlist.Parser.Node
         {
             string entityName = node.ChildNodes[1].Token.Text;
             var portSignals = new SignalTable();
+            this.declaredObjects.entityPrototype = new ComponentPrototype(entityName, portSignals);
 
             var portClauseNode = node.ChildNodes[3].ChildNodes[1].ChildNodes[0];
 
@@ -39,14 +40,16 @@ namespace BDVHDLtoNetlist.Parser.Node
                     if (attribute != null)
                     {
                         var pair = (KeyValuePair<Tuple<string, string>, object>)attribute;
+
+                        if(pair.Key.Item1 == this.declaredObjects.entityPrototype.name)
+                            this.declaredObjects.entityAttribute[pair.Key.Item2] = pair.Value;
+                        else if(portSignals.ContainsKey(pair.Key.Item1))
                         portSignals[pair.Key.Item1].attribute[pair.Key.Item2] = pair.Value;
                     }
                 }
 
-
-            var entity = new ComponentPrototype(entityName, portSignals);
-            this.declaredObjects.componentDeclarations[entityName] = entity;
-            return entity;
+            this.declaredObjects.componentDeclarations[entityName] = this.declaredObjects.entityPrototype;
+            return null;
         }
     }
 }

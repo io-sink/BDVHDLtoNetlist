@@ -26,13 +26,44 @@ namespace BDVHDLtoNetlist.Parser.Node
 
                 var inputSignal = (ISignal)primary;
 
-                var newSignalName = this.declaredObjects.signalNameGenerator.getSignalName();
-                var newSignal = new StdLogic(newSignalName);
+                if(!inputSignal.name.isTemp)
+                {
+                    // notゲートを生成
+                    var newSignalName = this.declaredObjects.signalNameGenerator.getSignalName();
+                    var newSignal = new StdLogic(newSignalName);
+                    this.declaredObjects.signalTable[newSignalName] = newSignal;
 
-                var notGate = new LogicGate(LogicGate.GateType.NOT, new List<ISignal> { inputSignal }, newSignal);
-                this.declaredObjects.logicGates.Add(notGate);
+                    var notGate = new LogicGate(LogicGate.GateType.NOT, new List<ISignal> { inputSignal }, newSignal);
+                    this.declaredObjects.logicGates.Add(notGate);
 
-                return newSignal;
+                    return newSignal;
+                }
+                else
+                {
+                    // and, or, xorをnand, nor, xnorに変換
+                    foreach(var gate in this.declaredObjects.logicGates)
+                        if(gate.outputSignal.Equals(inputSignal))
+                        {
+                            switch (gate.gateType) 
+                            {
+                                case LogicGate.GateType.AND:
+                                    gate.gateType = LogicGate.GateType.NAND;
+                                    break;
+                                case LogicGate.GateType.OR:
+                                    gate.gateType = LogicGate.GateType.NOR;
+                                    break;
+                                case LogicGate.GateType.XOR:
+                                    gate.gateType = LogicGate.GateType.XNOR;
+                                    break;
+                                default:
+                                    throw new Exception("");
+                            }
+                            return inputSignal;
+                        }
+
+                    throw new Exception("");
+                }
+
             }
             else
             {

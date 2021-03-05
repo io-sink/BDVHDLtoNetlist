@@ -39,6 +39,7 @@ namespace BDVHDLtoNetlist.Parser.Node
 
                 var newSignalName = this.declaredObjects.signalNameGenerator.getSignalName();
                 var newSignal = new StdLogic(newSignalName);
+                this.declaredObjects.signalTable[newSignalName] = newSignal;
 
                 var logicGate = new LogicGate(gateType, inputSignals, newSignal);
                 this.declaredObjects.logicGates.Add(logicGate);

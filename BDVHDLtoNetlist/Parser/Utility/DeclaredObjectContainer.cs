@@ -11,6 +11,9 @@ namespace BDVHDLtoNetlist.Parser.Utility
 {
     class DeclaredObjectContainer
     {
+        public ComponentPrototype entityPrototype;
+        public Dictionary<string, object> entityAttribute;
+
         public SignalTable signalTable;
         public Dictionary<string, ComponentPrototype> componentDeclarations;
 
@@ -18,19 +21,24 @@ namespace BDVHDLtoNetlist.Parser.Utility
         public List<LogicGate> logicGates;
         public List<Component> components;
 
-        public SignalNameGenerator signalNameGenerator;
+        public TempSignalNameGenerator signalNameGenerator;
 
         public DeclaredObjectContainer()
         {
+            this.entityAttribute = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             this.signalTable = new SignalTable();
             this.componentDeclarations = new Dictionary<string, ComponentPrototype>(StringComparer.OrdinalIgnoreCase);
             this.assignments = new List<KeyValuePair<ISignal, ISignal>>();
             this.logicGates = new List<LogicGate>();
             this.components = new List<Component>();
-            this.signalNameGenerator = new SignalNameGenerator();
+            this.signalNameGenerator = new TempSignalNameGenerator();
         }
-        private void PrintAll()
+
+        public void Print()
         {
+            foreach (var pair in this.entityAttribute)
+                Console.WriteLine("[ATTRIBUTE] {0} -> {1}", pair.Key, pair.Value.ToString());
+
             foreach (string signalName in this.signalTable.Keys)
                 Console.WriteLine("[SIGNAL] ({0}) -> ({1})", signalName, this.signalTable[signalName]);
 

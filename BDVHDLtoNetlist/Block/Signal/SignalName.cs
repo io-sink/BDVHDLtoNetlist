@@ -13,6 +13,13 @@ namespace BDVHDLtoNetlist.Block.Signal
         public int? stIndex { get; }
         public int? edIndex { get; }
 
+        public bool isTemp { get; private set; } = false;
+
+        public void SetTemp()
+        {
+            this.isTemp = true;
+        }
+
         public SignalName(string baseName, int? stIndex = null, int? edIndex = null)
         {
             this.baseName = baseName;

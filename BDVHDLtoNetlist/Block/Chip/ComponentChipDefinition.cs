@@ -6,30 +6,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BDVHDLtoNetlist.Block.Library
+namespace BDVHDLtoNetlist.Block.Chip
 {
-    class ComponentChip : IChip
+    class ComponentChipDefinition : IChipDefinition
     {
         public ComponentPrototype componentPrototype { get; }
 
         // ゲートのシグナル -> チップのピン
         public Dictionary<ISignal, ISignal>[] portNameMappings { get; }
 
+        public int componentCount { get { return portNameMappings.Length; } }
+
         // チップのピン -> 信号名
         public Dictionary<ISignal, SignalName> constAssignMappings { get; }
 
+        public Dictionary<string, object> chipAttribute { get; }
 
-        private ComponentChip(
+        private ComponentChipDefinition(
             ComponentPrototype componentPrototype,
             Dictionary<ISignal, ISignal>[] portNameMappings,
-            Dictionary<ISignal, SignalName> constAssignMappings)
+            Dictionary<ISignal, SignalName> constAssignMappings,
+            Dictionary<string, object> chipAttribute)
         {
             this.componentPrototype = componentPrototype;
             this.portNameMappings = portNameMappings;
             this.constAssignMappings = constAssignMappings;
+            this.chipAttribute = chipAttribute;
         }
 
-        public static ComponentChip ImportFromFile(string fileName)
+        public static ComponentChipDefinition ImportFromFile(string fileName)
         {
             var portNameMappings = new List<Dictionary<ISignal, ISignal>>();
             var constAssignMapping = new Dictionary<ISignal, SignalName>();
@@ -97,21 +102,25 @@ namespace BDVHDLtoNetlist.Block.Library
                         constAssignMapping[inPort] = SignalName.Parse((string)constValue);
                 }
 
-            return new ComponentChip(componentPrototype, portNameMappings.ToArray(), constAssignMapping);
+            return new ComponentChipDefinition(componentPrototype, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);
         }
 
         public void Print()
         {
             Console.WriteLine(this.componentPrototype.name);
+
+            foreach (var pair in this.chipAttribute)
+                Console.WriteLine("[ATTRIBUTE] {0} -> {1}", pair.Key, pair.Value.ToString());
+
             for (int i = 0; i < this.portNameMappings.Length; ++i)
             {
-                Console.WriteLine("{0}: ", i);
+                Console.WriteLine("[PORT] {0}: ", i);
                 foreach (var pair in this.portNameMappings[i])
                     Console.WriteLine("\t{0} -> {1}", pair.Key, pair.Value);
             }
 
             foreach (var pair in this.constAssignMappings)
-                Console.WriteLine("{0} -> {1}", pair.Key, pair.Value);
+                Console.WriteLine("[CONST] {0} -> {1}", pair.Key, pair.Value);
         }
     }
 }

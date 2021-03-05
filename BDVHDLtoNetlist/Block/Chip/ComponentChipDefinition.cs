@@ -45,7 +45,7 @@ namespace BDVHDLtoNetlist.Block.Chip
             if (objects.components.Count == 0 ||
                 objects.componentDeclarations.Count == 1 ||
                 objects.logicGates.Count > 0)
-                throw new Exception("");
+                return null;
 
             // チップの入力信号
             var inPortSet = new HashSet<ISignal>(objects.signalTable.Values.Where(

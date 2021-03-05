@@ -24,24 +24,21 @@ namespace BDVHDLtoNetlist.Block.Chip
 
         public Dictionary<string, object> chipAttribute { get; }
 
-        public bool defaultHigh { get; }
+        public bool defaultHigh { get { return gateType == GateType.AND || gateType == GateType.NAND; } }
 
-        private static HashSet<GateType> activeHighGates = new HashSet<GateType>() { GateType.AND, GateType.NAND };
 
         private GateChipDefinition(
             GateType gateType, 
             int gateWidth,
             Dictionary<ISignal, ISignal>[] portNameMappings, 
             Dictionary<ISignal, SignalName> constAssignMappings,
-            Dictionary<string, object> chipAttribute, 
-            bool defaultHigh = false)
+            Dictionary<string, object> chipAttribute)
         {
             this.gateType = gateType;
             this.gateWidth = gateWidth;
             this.portNameMappings = portNameMappings;
             this.constAssignMappings = constAssignMappings;
             this.chipAttribute = chipAttribute;
-            this.defaultHigh = defaultHigh;
         }
 
         public static GateChipDefinition ImportFromFile(string fileName)
@@ -55,7 +52,7 @@ namespace BDVHDLtoNetlist.Block.Chip
             if (objects.components.Count > 0 || 
                 objects.componentDeclarations.Count > 1 || 
                 objects.logicGates.Count == 0)
-                throw new Exception("");
+                return null;
 
             // チップの入力信号
             var inPortSet = new HashSet<ISignal>(objects.signalTable.Values.Where(
@@ -110,7 +107,7 @@ namespace BDVHDLtoNetlist.Block.Chip
                         constAssignMapping[inPort] = SignalName.Parse((string)constValue);
                 }
 
-            return new GateChipDefinition(gateType, gateWidth, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute, activeHighGates.Contains(gateType));
+            return new GateChipDefinition(gateType, gateWidth, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);
         }
 
         public void Print()

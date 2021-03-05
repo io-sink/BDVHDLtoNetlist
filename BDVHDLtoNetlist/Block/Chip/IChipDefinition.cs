@@ -16,5 +16,6 @@ namespace BDVHDLtoNetlist.Block.Chip
 
         Dictionary<string, object> chipAttribute { get; }
 
+        void Print();
     }
 }

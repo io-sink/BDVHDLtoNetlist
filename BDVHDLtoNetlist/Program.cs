@@ -1,5 +1,6 @@
 ﻿using BDVHDLtoNetlist.Block.Chip;
 using BDVHDLtoNetlist.Compiler;
+using BDVHDLtoNetlist.Writer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace BDVHDLtoNetlist
             Console.WriteLine();
             Console.WriteLine("-----------------");
 
-            foreach (var parts in compiler.libParts)
+            foreach (var parts in compiler.netComponents)
                 if(parts.chip is ComponentChipDefinition)
                     Console.WriteLine("[LIBPARTS]: {0} ({1})", ((ComponentChipDefinition)parts.chip).chipAttribute["component_name"], parts.GetHashCode());
                 else if(parts.chip is GateChipDefinition)
@@ -59,7 +60,11 @@ namespace BDVHDLtoNetlist
                     Console.WriteLine("\t{0}:pin{1}", node.libParts.GetHashCode(), node.pin);
             }
 
+
+            (new Writer.Writer()).Write(compiler, "out.net");
+
             Console.ReadKey();
+
         }
     }
 }

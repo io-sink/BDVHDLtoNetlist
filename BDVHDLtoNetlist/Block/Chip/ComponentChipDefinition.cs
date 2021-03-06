@@ -47,19 +47,10 @@ namespace BDVHDLtoNetlist.Block.Chip
                 objects.logicGates.Count > 0)
                 return null;
 
-            // チップの入力信号
-            var inPortSet = new HashSet<ISignal>(objects.signalTable.Values.Where(
-                x => x.mode == SignalMode.IN && x.GetType() == typeof(StdLogic)));
-
-            // チップの出力信号
-            var outPortSet = new HashSet<ISignal>(objects.signalTable.Values.Where(
-                x => x.mode == SignalMode.OUT && x.GetType() == typeof(StdLogic)));
-
-            // チップの出力信号に直結した信号
-            var outPortAssignment = new Dictionary<ISignal, ISignal>();
-            foreach (var pair in objects.assignments.Where(
-                x => x.Key.mode == SignalMode.OUT && x.Key.GetType() == typeof(StdLogic)))
-                outPortAssignment.Add(pair.Value, pair.Key);
+            // チップの入出力信号
+            var portSet = new HashSet<ISignal>(objects.signalTable.Values.Where(
+                x => (x.mode == SignalMode.IN || x.mode == SignalMode.OUT || x.mode == SignalMode.INOUT) && 
+                x.GetType() == typeof(StdLogic)));
 
             // ポートの対応関係を作成
             ComponentPrototype componentPrototype = objects.components[0].prototype;
@@ -70,36 +61,30 @@ namespace BDVHDLtoNetlist.Block.Chip
 
                 var portNameMap = new Dictionary<ISignal, ISignal>();
 
-
                 foreach (var componentSignal in component.portMap.Keys)
-                    if(componentSignal.mode == SignalMode.IN)
+                    if(componentSignal.mode == SignalMode.IN || 
+                        componentSignal.mode == SignalMode.OUT ||
+                        componentSignal.mode == SignalMode.INOUT)
                     {
-                        if (!inPortSet.Contains(component.portMap[componentSignal]))
+                        if (!portSet.Contains(component.portMap[componentSignal]))
                             throw new Exception("");
-                        inPortSet.Remove(component.portMap[componentSignal]);
+                        portSet.Remove(component.portMap[componentSignal]);
 
                         portNameMap.Add(componentSignal, component.portMap[componentSignal]);
                     }
-                    else if(componentSignal.mode == SignalMode.OUT)
-                    {
-                        if (!outPortSet.Contains(component.portMap[componentSignal]))
-                            throw new Exception("");
-                        outPortSet.Remove(component.portMap[componentSignal]);
-
-                        portNameMap.Add(componentSignal, component.portMap[componentSignal]);
-                    }
-
 
                 portNameMappings.Add(portNameMap);
             }
 
-            // チップの入力でコンポネントの入力以外に接続するもの
-            foreach (var inPort in inPortSet)
-                if (inPort.attribute.ContainsKey("const_assign"))
+            // チップの入力でコンポネントの入出力以外に接続するもの
+            foreach (var port in objects.signalTable.Values)
+                if ((port.mode == SignalMode.IN || port.mode == SignalMode.INOUT) &&
+                    portSet.Contains(port) && /* まだ接続されていない */
+                    port.attribute.ContainsKey("const_assign"))
                 {
-                    var constValue = inPort.attribute["const_assign"];
+                    var constValue = port.attribute["const_assign"];
                     if (constValue is string)
-                        constAssignMapping[inPort] = SignalName.Parse((string)constValue);
+                        constAssignMapping[port] = SignalName.Parse((string)constValue);
                 }
 
             return new ComponentChipDefinition(componentPrototype, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);

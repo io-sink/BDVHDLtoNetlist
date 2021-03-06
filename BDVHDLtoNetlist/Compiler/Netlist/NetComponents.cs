@@ -11,11 +11,16 @@ using System.Threading.Tasks;
 
 namespace BDVHDLtoNetlist.Compiler.Netlist
 {
-    class LibParts
+    class NetComponents
     {
         public IChipDefinition chip { get; }
 
-        public LibParts(
+        public int id { get; }
+        public string name { get { return string.Format("U{0}", this.id); } }
+
+        private static int count = 0;
+
+        public NetComponents(
             ComponentChipDefinition componentChip, 
             List<Component> components, 
             Dictionary<StdLogic, Net> netMap, 
@@ -27,7 +32,8 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                 throw new Exception();
 
             this.chip = componentChip;
-            
+            this.id = ++NetComponents.count;
+
             for (int i = 0; i < components.Count; ++i)
                 foreach (var portPair in components[i].portMap)
                 {
@@ -44,10 +50,9 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                 }
 
             ProcesConstAssign(componentChip.constAssignMappings, this, design, representingNet);
-
         }
 
-        public LibParts(
+        public NetComponents(
             GateChipDefinition gateChip, 
             List<LogicGate> gates, 
             Dictionary<StdLogic, Net> netMap,
@@ -59,6 +64,7 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                 throw new Exception();
 
             this.chip = gateChip;
+            this.id = ++NetComponents.count;
 
             for (int i = 0; i < gates.Count; ++i)
             {
@@ -108,22 +114,32 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
         // チップのconst_assignを処理
         void ProcesConstAssign(
             Dictionary<ISignal, SignalName> constAssignMappings, 
-            LibParts libParts, 
+            NetComponents libParts, 
             
             DeclaredObjectContainer design,
             Dictionary<StdLogic, Net> representingNet)
         {
             foreach (var constAssign in constAssignMappings)
             {
-                var assignedSignalName = constAssign.Value;
-                if (!design.signalTable.ContainsKey(assignedSignalName.baseName))
-                    throw new Exception();
+                Net assignedNet;
 
-                var assignedSignal = design.signalTable[assignedSignalName];
-                if (!(assignedSignal is StdLogic))
-                    throw new Exception();
+                if (constAssign.Value.baseName.ToLower() == "open")
+                {
+                    var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
+                    assignedNet = representingNet[tempSignal] = new Net();
+                }
+                else
+                {
+                    var assignedSignalName = constAssign.Value;
+                    if (!design.signalTable.ContainsKey(assignedSignalName.baseName))
+                        throw new Exception();
 
-                var assignedNet = representingNet[(StdLogic)assignedSignal];
+                    var assignedSignal = design.signalTable[assignedSignalName];
+                    if (!(assignedSignal is StdLogic))
+                        throw new Exception();
+
+                    assignedNet = representingNet[(StdLogic)assignedSignal];
+                }
 
                 if (!constAssign.Key.attribute.ContainsKey("pin_assign"))
                     throw new Exception();

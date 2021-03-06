@@ -16,7 +16,7 @@ namespace BDVHDLtoNetlist.Compiler
     {
         public Dictionary<StdLogic, Net> representingNet { get; set; }
 
-        public List<LibParts> libParts { get; set; }
+        public List<NetComponents> netComponents { get; set; }
 
         private DeclaredObjectContainer design;
 
@@ -78,7 +78,7 @@ namespace BDVHDLtoNetlist.Compiler
 
 
             // 回路パーツに変換
-            this.libParts = new List<LibParts>();
+            this.netComponents = new List<NetComponents>();
             var componentQueue = new Dictionary<ComponentPrototype, List<Component>>();
             var gateQueue = new Dictionary<LogicGate.GateType, List<LogicGate>>();
 
@@ -102,7 +102,7 @@ namespace BDVHDLtoNetlist.Compiler
                 throw new Exception();
             var groundSignal = (StdLogic)design.signalTable["GND"];
 
-
+            // コンポーネントのチップを作成
             foreach (var componentPrototype in componentQueue.Keys)
             {
                 while (componentQueue[componentPrototype].Count > 0)
@@ -135,12 +135,13 @@ namespace BDVHDLtoNetlist.Compiler
                     }
                     
 
-                    var parts = new LibParts(componentChips[componentPrototype], components, this.representingNet, design, this.representingNet);
-                    this.libParts.Add(parts);
+                    var parts = new NetComponents(componentChips[componentPrototype], components, this.representingNet, design, this.representingNet);
+                    this.netComponents.Add(parts);
 
                 }
             }
 
+            // ゲートのチップを作成
             foreach (var gateType in gateQueue.Keys)
             {
                 int gateWidth = 0;
@@ -157,8 +158,8 @@ namespace BDVHDLtoNetlist.Compiler
 
                     if(gatePool.Count == gateChips[gateType][gateWidth].gateCount)
                     {
-                        var parts = new LibParts(gateChips[gateType][gateWidth], gatePool, this.representingNet, design, this.representingNet);
-                        this.libParts.Add(parts);
+                        var parts = new NetComponents(gateChips[gateType][gateWidth], gatePool, this.representingNet, design, this.representingNet);
+                        this.netComponents.Add(parts);
 
                         gatePool.Clear();
                     }
@@ -176,14 +177,11 @@ namespace BDVHDLtoNetlist.Compiler
                     gatePool.Add(new LogicGate(gateType, groundSignals, tempSignal));
                 }
                 
-
                 if (gatePool.Count > 0)
                 {
-                    var parts = new LibParts(gateChips[gateType][gateWidth], gatePool, this.representingNet, design, this.representingNet);
-                    this.libParts.Add(parts);
+                    var parts = new NetComponents(gateChips[gateType][gateWidth], gatePool, this.representingNet, design, this.representingNet);
+                    this.netComponents.Add(parts);
                 }
-
-
 
             }
 

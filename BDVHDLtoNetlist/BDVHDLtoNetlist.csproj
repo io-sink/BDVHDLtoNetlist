@@ -65,7 +65,7 @@
     <Compile Include="Block\Signal\StdLogic.cs" />
     <Compile Include="Block\Signal\StdLogicVector.cs" />
     <Compile Include="Compiler\Compiler.cs" />
-    <Compile Include="Compiler\Netlist\LibParts.cs" />
+    <Compile Include="Compiler\Netlist\NetComponents.cs" />
     <Compile Include="Compiler\Netlist\Net.cs" />
     <Compile Include="Compiler\Netlist\Node.cs" />
     <Compile Include="Parser\Node\ArchitectureDeclarativePartEvaluator.cs" />
@@ -90,6 +90,8 @@
     <Compile Include="Parser\Utility\DeclaredObjectContainer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Writer\SExpr.cs" />
+    <Compile Include="Writer\Writer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

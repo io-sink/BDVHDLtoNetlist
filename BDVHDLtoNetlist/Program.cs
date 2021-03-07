@@ -57,7 +57,7 @@ namespace BDVHDLtoNetlist
             {
                 Console.WriteLine("[NET]: {0} -> {1}", pair.Key, pair.Value.name);
                 foreach (var node in pair.Value.adjacentNodes)
-                    Console.WriteLine("\t{0}:pin{1}", node.libParts.GetHashCode(), node.pin);
+                    Console.WriteLine("\t{0}:pin{1}", node.netComponent.GetHashCode(), node.pin);
             }
 
 

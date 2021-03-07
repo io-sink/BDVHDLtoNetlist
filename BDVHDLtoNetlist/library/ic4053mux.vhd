@@ -74,30 +74,30 @@ end ic4053mux;
 
 architecture logic of ic4053mux is 
 
-	component 21mux
+	component mux21
 		port(S : in std_logic;
-			B : in std_logic;
 			A : in std_logic;
+			B : in std_logic;
 			Y : out std_logic);
 	end component;
 
 begin 
 
-	mux0 : 21mux
+	mux0 : mux21
 	port MAP(
 			S => A,
 			A => X0,
 			B => X1,
 			Y => X_COM);
 
-	mux1 : 21mux
+	mux1 : mux21
 	port MAP(
 			S => B,
 			A => Y0,
 			B => Y1,
 			Y => Y_COM);
 			
-	mux2 : 21mux
+	mux2 : mux21
 	port MAP(
 			S => C,
 			A => Z0,

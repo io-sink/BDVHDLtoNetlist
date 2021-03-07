@@ -11,7 +11,7 @@ namespace BDVHDLtoNetlist.Writer
     {
         public void Write(Compiler.Compiler compiler, string outputFile)
         {
-            var export = new SExpr("expr");
+            var export = new SExpr("export");
             var components = new SExpr("components");
             var libparts = new SExpr("libparts");
             var nets = new SExpr("nets");
@@ -63,7 +63,24 @@ namespace BDVHDLtoNetlist.Writer
                 libparts.children.AddLast(libpart);
             }
 
+            foreach (var netSignal in compiler.representingNet.Values.Distinct())
+            {
+                var net = new SExpr("net");
+                net.children.AddLast(new SExpr("code", netSignal.id.ToString()));
+                net.children.AddLast(new SExpr("name", netSignal.name));
+
+                foreach (var netNode in netSignal.adjacentNodes)
+                {
+                    var node = new SExpr("node");
+                    node.children.AddLast(new SExpr("ref", netNode.netComponent.name));
+                    node.children.AddLast(new SExpr("pin", netNode.pin.ToString()));
+                    net.children.AddLast(node);
+                }
+                nets.children.AddLast(net);
+            }
+
             Console.WriteLine(export);
+            System.IO.File.WriteAllText(outputFile, export.ToString());
         }
     }
 }

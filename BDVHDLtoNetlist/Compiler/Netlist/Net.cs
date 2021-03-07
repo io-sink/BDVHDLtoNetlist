@@ -11,13 +11,14 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
     {
         private static int count = 0;
 
-        public string name { get; }
+        public int id { get; }
+        public string name { get { return string.Format("Net-{0}", this.id); } }
 
         public List<Node> adjacentNodes { get; }
 
         public Net(List<Node> adjacentNodes = null)
         {
-            this.name = string.Format("Net-{0}", ++count);
+            this.id = ++count;
             this.adjacentNodes = adjacentNodes == null ? new List<Node>() : adjacentNodes;
         }
     }

@@ -8,12 +8,12 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
 {
     class Node
     {
-        public NetComponents libParts { get; }
+        public NetComponents netComponent { get; }
         public int pin { get; }
 
         public Node(NetComponents libParts, int pin)
         {
-            this.libParts = libParts;
+            this.netComponent = libParts;
             this.pin = pin;
         }
     }

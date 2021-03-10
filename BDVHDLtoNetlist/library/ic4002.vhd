@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all; 
 
-entity ic7425 is 
+entity ic4002 is 
 port (
 	attribute library_name : string;
 	attribute component_name : string;
@@ -9,9 +9,9 @@ port (
 	attribute const_assign : string;
 	attribute pin_assign : integer;
 
-	attribute library_name of ic7425 is "74xx";
-	attribute component_name of ic7425 is "74HC25";
-	attribute footprint_name of ic7425 is "Package_DIP:DIP-14_W7.62mm_Socket_LongPads";
+	attribute library_name of ic4002 is "4xxx";
+	attribute component_name of ic4002 is "4002";
+	attribute footprint_name of ic4002 is "Package_DIP:DIP-14_W7.62mm_Socket_LongPads";
 
 	GND : in std_logic;
 	attribute const_assign of GND is "GND";
@@ -22,20 +22,20 @@ port (
 	attribute pin_assign of VCC is 14;
 	attribute pin_type of VCC is "power_in";
 
-	G1 : in std_logic;
-	attribute const_assign of G1 is "VCC";
-	attribute pin_assign of G1 is 3;
-	attribute pin_type of G1 is "input";
-	G2 : in std_logic;
-	attribute const_assign of G2 is "VCC";
-	attribute pin_assign of G2 is 11;
-	attribute pin_type of G2 is "input";
+	NC1 : in std_logic;
+	attribute const_assign of NC1 is "open";
+	attribute pin_assign of NC1 is 6;
+	attribute pin_type of NC1 is "input";
+	NC2 : in std_logic;
+	attribute const_assign of NC2 is "open";
+	attribute pin_assign of NC2 is 8;
+	attribute pin_type of NC2 is "input";
 
 	A1 : in std_logic;
-	attribute pin_assign of A1 is 1;
+	attribute pin_assign of A1 is 2;
 	attribute pin_type of A1 is "input";
 	B1 : in std_logic;
-	attribute pin_assign of B1 is 2;
+	attribute pin_assign of B1 is 3;
 	attribute pin_type of B1 is "input";
 	C1 : in std_logic;
 	attribute pin_assign of C1 is 4;
@@ -44,7 +44,7 @@ port (
 	attribute pin_assign of D1 is 5;
 	attribute pin_type of D1 is "input";
 	Y1 : out std_logic;
-	attribute pin_assign of Y1 is 6;
+	attribute pin_assign of Y1 is 1;
 	attribute pin_type of Y1 is "output";
 
 	A2 : in std_logic;
@@ -54,18 +54,18 @@ port (
 	attribute pin_assign of B2 is 10;
 	attribute pin_type of B2 is "input";
 	C2 : in std_logic;
-	attribute pin_assign of C2 is 12;
+	attribute pin_assign of C2 is 11;
 	attribute pin_type of C2 is "input";
 	D2 : in std_logic;
-	attribute pin_assign of D2 is 13;
+	attribute pin_assign of D2 is 12;
 	attribute pin_type of D2 is "input";
 	Y2 : out std_logic;
-	attribute pin_assign of Y2 is 8;
+	attribute pin_assign of Y2 is 13;
 	attribute pin_type of Y2 is "output"
 	);
-	end ic7425;
+	end ic4002;
 
-architecture logic of ic7425 is 
+architecture logic of ic4002 is 
 begin 
 
 	Y1 <= not(A1 or B1 or C1 or D1);

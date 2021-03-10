@@ -12,7 +12,7 @@ port
 
 		attribute library_name of ic4067mux is "4xxx";
 		attribute component_name of ic4067mux is "4067";
-		attribute footprint_name of ic4067mux is "Package_DIP:DIP-24_W7.62mm_Socket_LongPads";
+		attribute footprint_name of ic4067mux is "Package_DIP:DIP-24_W15.24mm_Socket_LongPads";
 
 		VSS : in std_logic;
 		attribute const_assign of VSS is "GND";

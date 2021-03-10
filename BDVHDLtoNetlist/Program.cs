@@ -61,8 +61,23 @@ namespace BDVHDLtoNetlist
                     Console.WriteLine("\t{0}:pin{1}", node.netComponent.GetHashCode(), node.pin);
             }
 
-
             (new Writer.Writer()).Write(compiler, "out.net");
+
+
+            // パーツリストを出力
+            var componentList = new Dictionary<IChipDefinition, int>();
+            foreach (var netComponent in compiler.netComponents)
+            {
+                if (!componentList.ContainsKey(netComponent.chip))
+                    componentList[netComponent.chip] = 0;
+                componentList[netComponent.chip]++;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("----- partslist -----");
+            foreach (var pair in componentList)
+                Console.WriteLine("{0} : {1}", pair.Key.chipAttribute["component_name"], pair.Value);
+            Console.WriteLine("sum : {0}", componentList.Values.Sum());
 
             Console.ReadKey();
 

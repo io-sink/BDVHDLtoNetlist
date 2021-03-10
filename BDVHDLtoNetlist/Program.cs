@@ -12,7 +12,8 @@ namespace BDVHDLtoNetlist
         static void Main(string[] args)
         {
             // string programFile = args[0];
-            string programFile = "test00.vhd";
+            string programFile = @"C:\Users\yutar\Documents\HDL_Workspace\core2.1_circuit_diagram\core21.vhd";
+            // string programFile = @"test01.vhd";
             string chipDefinitionDirectory = @"..\..\library";
 
             string program = System.IO.File.ReadAllText(programFile);
@@ -37,7 +38,7 @@ namespace BDVHDLtoNetlist
 
                 Console.WriteLine();
                 Console.WriteLine("------ {0} ------", chipDesignFile);
-                chipDefinition.Print();
+                // chipDefinition.Print();
             }
 
 

@@ -57,14 +57,14 @@ namespace BDVHDLtoNetlist.Block.Signal
             if (obj == null || obj.GetType() != this.GetType())
                 return false;
             else
-                return this.baseName == ((SignalName)obj).baseName &&
+                return this.baseName.ToLower() == ((SignalName)obj).baseName.ToLower() &&
                     this.stIndex == ((SignalName)obj).stIndex &&
                     this.edIndex == ((SignalName)obj).edIndex;
         }
 
         public override int GetHashCode()
         {
-            return this.baseName.GetHashCode() ^ this.stIndex.GetHashCode() ^ this.edIndex.GetHashCode();
+            return this.baseName.ToLower().GetHashCode() ^ this.stIndex.GetHashCode() ^ this.edIndex.GetHashCode();
         }
     }
 }

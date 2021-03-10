@@ -26,7 +26,7 @@ namespace BDVHDLtoNetlist.Block.Component
             else
             {
                 var foreignSignals = ((ComponentPrototype)obj).signals;
-                return this.name == ((ComponentPrototype)obj).name &&
+                return this.name.ToLower() == ((ComponentPrototype)obj).name.ToLower() &&
                         this.signals.Count == foreignSignals.Count && 
                         !this.signals.Except(foreignSignals).Any();
             }
@@ -34,7 +34,7 @@ namespace BDVHDLtoNetlist.Block.Component
 
         public override int GetHashCode()
         {
-            return this.signals.Aggregate(this.name.GetHashCode(), (y, x) => y ^ x.Key.GetHashCode() ^ x.Value.GetHashCode());
+            return this.signals.Aggregate(this.name.ToLower().GetHashCode(), (y, x) => y ^ x.Key.GetHashCode() ^ x.Value.GetHashCode());
         }
 
     }

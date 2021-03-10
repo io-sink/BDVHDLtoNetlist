@@ -57,7 +57,7 @@ namespace BDVHDLtoNetlist.Block.Signal
 
         public override string ToString()
         {
-            string res = string.Format("{0}: std_logic_vector[{1}..{2}]({3}, ", name, stRange, size, mode);
+            string res = string.Format("{0}: std_logic_vector[{1}..{2}]({3}, ", name, stRange, stRange + size - 1, mode);
             foreach (var pair in this.attribute)
                 res += string.Format("{0} = {1}, ", pair.Key, pair.Value);
             res += ")";

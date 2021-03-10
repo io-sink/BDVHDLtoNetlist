@@ -119,10 +119,12 @@ slice_name ::= identifier ( range_constraint )
 
 component_instantiation_statement ::= 
   identifier : [ COMPONENT ] identifier [ generic_map_aspect ] [ port_map_aspect ] ;
-generic_map_aspect ::= GENERIC MAP ( association_list )
-association_list ::= association_element { , association_element }
-association_element ::= name => name
-port_map_aspect ::= PORT MAP ( association_list )
+generic_map_aspect ::= GENERIC MAP ( generic_association_list )
+port_map_aspect ::= PORT MAP ( port_association_list )
+generic_association_list ::= generic_association_element { , generic_association_element }
+port_association_list ::= port_association_element { , port_association_element }
+generic_association_element ::= name => expression
+port_association_element ::= name => name
 
 expression ::= and_expression | or_expression | xor_expression | nand_expression | nor_expression | xnor_expression
 and_expression ::= factor { AND factor }

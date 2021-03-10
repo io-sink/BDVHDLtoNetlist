@@ -173,9 +173,11 @@ namespace BDVHDLtoNetlist.Parser
 
             NonTerminal componentInstatiationStatement = new NonTerminal("component_instantiation_statement");
             NonTerminal genericMapAspect = new NonTerminal("generic_map_aspect");
-            NonTerminal associationList = new NonTerminal("association_list");
-            NonTerminal associationElement = new NonTerminal("association_element");
             NonTerminal portMapAspect = new NonTerminal("port_map_aspect");
+            NonTerminal portAssociationList = new NonTerminal("port_association_list");
+            NonTerminal portAssociationElement = new NonTerminal("port_association_element");
+            NonTerminal genericAssociationList = new NonTerminal("generic_association_list");
+            NonTerminal genericAssociationElement = new NonTerminal("generic_association_element");
 
             NonTerminal expression = new NonTerminal("expression");
             NonTerminal andExpression = new NonTerminal("and_expression");
@@ -251,10 +253,14 @@ namespace BDVHDLtoNetlist.Parser
             sliceName.Rule = sIdentifier + sLParen + rangeConstraint + sRParen;
 
             componentInstatiationStatement.Rule = sIdentifier + sColon + sComponent.Q() + sIdentifier + genericMapAspect.Q() + portMapAspect.Q() + sSemicolon;
-            genericMapAspect.Rule = sGeneric + sMap + sLParen + associationList + sRParen;
-            associationList.Rule = MakePlusRule(associationList, sComma, associationElement);
-            associationElement.Rule = name + sRArrow + name;
-            portMapAspect.Rule = sPort + sMap + sLParen + associationList + sRParen;
+            genericMapAspect.Rule = sGeneric + sMap + sLParen + genericAssociationList + sRParen;
+            portMapAspect.Rule = sPort + sMap + sLParen + portAssociationList + sRParen;
+
+            genericAssociationList.Rule = MakePlusRule(genericAssociationList, sComma, genericAssociationElement);
+            genericAssociationElement.Rule = name + sRArrow + expression;
+
+            portAssociationList.Rule = MakePlusRule(portAssociationList, sComma, portAssociationElement);
+            portAssociationElement.Rule = name + sRArrow + name;
 
             expression.Rule = andExpression | orExpression | xorExpression | nandExpression | norExpression | xnorExpression;
             andExpression.Rule = MakePlusRule(andExpression, sAnd, factor);

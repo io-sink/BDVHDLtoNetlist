@@ -151,8 +151,14 @@ namespace BDVHDLtoNetlist.Compiler
 
                 foreach (var gate in gateQueue[gateType])
                 {
-                    if(gatePool.Count == 0)
-                        gateWidth = gateChips[gateType].Keys.Where(x => x >= gate.inputSignals.Count).First();
+                    if (gatePool.Count == 0)
+                    {
+                        var gateWidthCandidate = gateChips[gateType].Keys.Where(x => x >= gate.inputSignals.Count);
+                        if (gateWidthCandidate.Count() == 0)
+                            throw new Exception(string.Format("{0}{1} is not defined", gateType, gate.inputSignals.Count));
+
+                        gateWidth = gateWidthCandidate.First();
+                    }
 
                     gatePool.Add(gate);
 

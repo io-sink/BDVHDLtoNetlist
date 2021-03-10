@@ -77,7 +77,7 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                     netInputSignal.adjacentNodes.Add(new Node(this, (int)chipInputSignal.attribute["pin_assign"]));
                 }
 
-                for (int j = gates[i].inputSignals.Count; j < gateChip.gateWidth; ++i)
+                for (int j = gates[i].inputSignals.Count; j < gateChip.gateWidth; ++j)
                 {
                     var chipInputSignal = gateChip.portNameMappings[i][new StdLogic(new SignalName(".in" + j))];
                     if (!chipInputSignal.attribute.ContainsKey("pin_assign"))

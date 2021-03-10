@@ -18,8 +18,6 @@ namespace BDVHDLtoNetlist.Compiler
 
         public List<NetComponents> netComponents { get; set; }
 
-        private DeclaredObjectContainer design;
-
         public void Compile(DeclaredObjectContainer design, List<IChipDefinition> chips)
         {
             this.representingNet = new Dictionary<StdLogic, Net>();
@@ -96,7 +94,6 @@ namespace BDVHDLtoNetlist.Compiler
                 gateQueue[gate.gateType].Add(gate);
             }
 
-
             // GNDを取得
             if (!design.signalTable.ContainsKey("GND") || !(design.signalTable["GND"] is StdLogic))
                 throw new Exception();
@@ -112,7 +109,7 @@ namespace BDVHDLtoNetlist.Compiler
 
                     for (int i = 0; i < dequeueCount; ++i)
                     {
-                        components.Add(componentQueue[componentPrototype].First());
+                        components.Add(componentQueue[componentPrototype].Last());
                         componentQueue[componentPrototype].RemoveAt(componentQueue[componentPrototype].Count - 1);
                     }
 

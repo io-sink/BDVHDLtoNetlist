@@ -13,6 +13,7 @@ namespace BDVHDLtoNetlist
         {
             // string programFile = args[0];
             string programFile = @"C:\Users\yutar\Documents\HDL_Workspace\core2.1_circuit_diagram\core21.vhd";
+
             // string programFile = @"test01.vhd";
             string chipDefinitionDirectory = @"..\..\library";
 
@@ -60,6 +61,7 @@ namespace BDVHDLtoNetlist
                 foreach (var node in pair.Value.adjacentNodes)
                     Console.WriteLine("\t{0}:pin{1}", node.netComponent.GetHashCode(), node.pin);
             }
+
 
             (new Writer.Writer()).Write(compiler, "out.net");
 

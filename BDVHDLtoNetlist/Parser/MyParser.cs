@@ -4,6 +4,7 @@ using System.Text;
 using BDVHDLtoNetlist.Block.Component;
 using BDVHDLtoNetlist.Block.Gate;
 using BDVHDLtoNetlist.Block.Signal;
+using BDVHDLtoNetlist.Exceptions;
 using BDVHDLtoNetlist.Parser;
 using BDVHDLtoNetlist.Parser.Node;
 using BDVHDLtoNetlist.Parser.Utility;
@@ -14,18 +15,16 @@ namespace BDVHDLtoNetlist.Parser
 {
     class MyParser
     {
-        public DeclaredObjectContainer Parse(string program)
+        public DeclaredObjectContainer Parse(string programFile)
         {
+            string program = System.IO.File.ReadAllText(programFile);
+
             var grammar = new BDVHDLGrammar();
             var parser = new Irony.Parsing.Parser(grammar);
             var ast = parser.Parse(program);
 
-            Console.WriteLine(ast.Status);
-            foreach (var msg in ast.ParserMessages)
-                Console.WriteLine("{0}: {1}", msg.Location, msg.Message);
-
             if (ast.Status != ParseTreeStatus.Parsed)
-                return null;
+                throw new ParserException(programFile, ast.Status, ast.ParserMessages);
 
             (new TreeConverter()).Convert(ast, grammar);
 

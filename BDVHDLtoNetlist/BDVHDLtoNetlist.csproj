@@ -68,6 +68,9 @@
     <Compile Include="Compiler\Netlist\NetComponents.cs" />
     <Compile Include="Compiler\Netlist\Net.cs" />
     <Compile Include="Compiler\Netlist\Node.cs" />
+    <Compile Include="Exceptions\ChipDefinitionException.cs" />
+    <Compile Include="Exceptions\CompilerException.cs" />
+    <Compile Include="Exceptions\ParserException.cs" />
     <Compile Include="Parser\Node\ArchitectureDeclarativePartEvaluator.cs" />
     <Compile Include="Parser\Node\AttributeSpecificationEvaluator.cs" />
     <Compile Include="Parser\Node\ComponentDeclarationEvaluator.cs" />

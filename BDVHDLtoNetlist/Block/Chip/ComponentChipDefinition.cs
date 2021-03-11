@@ -1,5 +1,6 @@
 ﻿using BDVHDLtoNetlist.Block.Component;
 using BDVHDLtoNetlist.Block.Signal;
+using BDVHDLtoNetlist.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace BDVHDLtoNetlist.Block.Chip
 {
     class ComponentChipDefinition : IChipDefinition
     {
+        public string chipName { get; }
+
         public ComponentPrototype componentPrototype { get; }
 
         // ゲートのシグナル -> チップのピン
@@ -23,11 +26,13 @@ namespace BDVHDLtoNetlist.Block.Chip
         public Dictionary<string, object> chipAttribute { get; }
 
         private ComponentChipDefinition(
+            string chipName, 
             ComponentPrototype componentPrototype,
             Dictionary<ISignal, ISignal>[] portNameMappings,
             Dictionary<ISignal, SignalName> constAssignMappings,
             Dictionary<string, object> chipAttribute)
         {
+            this.chipName = chipName;
             this.componentPrototype = componentPrototype;
             this.portNameMappings = portNameMappings;
             this.constAssignMappings = constAssignMappings;
@@ -39,13 +44,14 @@ namespace BDVHDLtoNetlist.Block.Chip
             var portNameMappings = new List<Dictionary<ISignal, ISignal>>();
             var constAssignMapping = new Dictionary<ISignal, SignalName>();
 
-            string program = System.IO.File.ReadAllText(fileName);
-            var objects = (new Parser.MyParser()).Parse(program);
+            var objects = (new Parser.MyParser()).Parse(fileName);
 
             if (objects.components.Count == 0 ||
                 objects.componentDeclarations.Count == 1 ||
                 objects.logicGates.Count > 0)
                 return null;
+
+            string chipName = objects.entityPrototype.name;
 
             // チップの入出力信号
             var portSet = new HashSet<ISignal>(objects.signalTable.Values.Where(
@@ -57,7 +63,9 @@ namespace BDVHDLtoNetlist.Block.Chip
             foreach (var component in objects.components)
             {
                 if (component.prototype != componentPrototype)
-                    throw new Exception("");
+                    throw new ChipDefinitionException(fileName,
+                        string.Format(@"Component chip ""{0}"" has another component ""{1}""",
+                        componentPrototype.name, component.prototype.name));
 
                 var portNameMap = new Dictionary<ISignal, ISignal>();
 
@@ -67,9 +75,10 @@ namespace BDVHDLtoNetlist.Block.Chip
                         componentSignal.mode == SignalMode.INOUT)
                     {
                         if (!portSet.Contains(component.portMap[componentSignal]))
-                            throw new Exception("");
-                        portSet.Remove(component.portMap[componentSignal]);
+                            throw new ChipDefinitionException(fileName,
+                                string.Format("The port signal of the component must be connected directly to the port of the component"));
 
+                        portSet.Remove(component.portMap[componentSignal]);
                         portNameMap.Add(componentSignal, component.portMap[componentSignal]);
                     }
 
@@ -87,7 +96,7 @@ namespace BDVHDLtoNetlist.Block.Chip
                         constAssignMapping[port] = SignalName.Parse((string)constValue);
                 }
 
-            return new ComponentChipDefinition(componentPrototype, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);
+            return new ComponentChipDefinition(chipName, componentPrototype, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);
         }
 
         public void Print()

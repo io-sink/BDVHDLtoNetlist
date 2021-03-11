@@ -3,6 +3,7 @@ using BDVHDLtoNetlist.Block.Component;
 using BDVHDLtoNetlist.Block.Gate;
 using BDVHDLtoNetlist.Block.Signal;
 using BDVHDLtoNetlist.Compiler.Netlist;
+using BDVHDLtoNetlist.Exceptions;
 using BDVHDLtoNetlist.Parser.Utility;
 using System;
 using System.Collections.Generic;
@@ -69,10 +70,13 @@ namespace BDVHDLtoNetlist.Compiler
 
             foreach (var component in design.components)
                 if (!componentChips.ContainsKey(component.prototype))
-                    throw new Exception("No component chip definition found: " + component.prototype.name);
+                    throw new CompilerException(
+                        string.Format(@"No component chip definition was found for component ""{0}""", component.prototype.name));
+
             foreach (var gate in design.logicGates)
                 if (!gateChips.ContainsKey(gate.gateType))
-                    throw new Exception("No gate chip definition found: " + gate.gateType);
+                    throw new CompilerException(
+                        string.Format(@"No gate chip definition was found for gate ""{0}""", gate.gateType));
 
 
             // 回路パーツに変換
@@ -96,7 +100,9 @@ namespace BDVHDLtoNetlist.Compiler
 
             // GNDを取得
             if (!design.signalTable.ContainsKey("GND") || !(design.signalTable["GND"] is StdLogic))
-                throw new Exception();
+                throw new CompilerException(
+                    string.Format(@"Signal ""{0}"" was not found in design", "GND"));
+
             var groundSignal = (StdLogic)design.signalTable["GND"];
 
             // コンポーネントのチップを作成
@@ -113,28 +119,26 @@ namespace BDVHDLtoNetlist.Compiler
                         componentQueue[componentPrototype].RemoveAt(componentQueue[componentPrototype].Count - 1);
                     }
 
-                    
-                    // 空いた入力ポートをGNDに固定
+                    // 空いた入力ポートをGNDに固定，出力ポートに仮の信号を接続したコンポネントを追加
                     for (int i = dequeueCount; i < componentChips[componentPrototype].componentCount; ++i)
                     {
                         var portMap = new Dictionary<ISignal, ISignal>();
-                        foreach (var inPortSignal in componentPrototype.signals)
-                            if (inPortSignal.Value.mode == SignalMode.IN || inPortSignal.Value.mode == SignalMode.INOUT)
-                                portMap[inPortSignal.Value] = groundSignal;
-                            else
+                        foreach (var portSignal in componentPrototype.signals)
+                            if (portSignal.Value.mode == SignalMode.IN)
+                                portMap[portSignal.Value] = groundSignal;
+
+                            else if(portSignal.Value.mode == SignalMode.OUT || portSignal.Value.mode == SignalMode.INOUT)
                             {
                                 var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
                                 this.representingNet[tempSignal] = new Net();
-                                portMap[inPortSignal.Value] = tempSignal;
+                                portMap[portSignal.Value] = tempSignal;
                             }
 
                         components.Add(new Component("dummy", componentPrototype, portMap));
                     }
                     
-
                     var parts = new NetComponents(componentChips[componentPrototype], components, this.representingNet, design, this.representingNet);
                     this.netComponents.Add(parts);
-
                 }
             }
 
@@ -152,7 +156,8 @@ namespace BDVHDLtoNetlist.Compiler
                     {
                         var gateWidthCandidate = gateChips[gateType].Keys.Where(x => x >= gate.inputSignals.Count);
                         if (gateWidthCandidate.Count() == 0)
-                            throw new Exception(string.Format("{0}{1} is not defined", gateType, gate.inputSignals.Count));
+                            throw new CompilerException(
+                                string.Format(@"Gate {0}{1} is not defined", gateType, gate.inputSignals.Count));
 
                         gateWidth = gateWidthCandidate.First();
                     }
@@ -168,23 +173,24 @@ namespace BDVHDLtoNetlist.Compiler
                     }
                 }
 
-                
-                // 余ったゲートの入力をGNDに固定
-                var groundSignals = new List<ISignal>();
-                for (int i = 0; i < gateWidth; ++i)
-                    groundSignals.Add(groundSignal);
-                for (int i = gatePool.Count; i < gateChips[gateType][gateWidth].gateCount; ++i)
-                {
-                    var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
-                    this.representingNet[tempSignal] = new Net();
-                    gatePool.Add(new LogicGate(gateType, groundSignals, tempSignal));
-                }
-                
                 if (gatePool.Count > 0)
                 {
+                    // 余ったゲートの入力をGNDに固定，出力に仮の信号を接続したゲートを追加
+                    var groundSignals = new List<ISignal>();
+                    for (int i = 0; i < gateWidth; ++i)
+                        groundSignals.Add(groundSignal);
+
+                    for (int i = gatePool.Count; i < gateChips[gateType][gateWidth].gateCount; ++i)
+                    {
+                        var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
+                        this.representingNet[tempSignal] = new Net();
+                        gatePool.Add(new LogicGate(gateType, groundSignals, tempSignal));
+                    }
+
                     var parts = new NetComponents(gateChips[gateType][gateWidth], gatePool, this.representingNet, design, this.representingNet);
                     this.netComponents.Add(parts);
                 }
+
 
             }
 

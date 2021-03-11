@@ -2,6 +2,7 @@
 using BDVHDLtoNetlist.Block.Component;
 using BDVHDLtoNetlist.Block.Gate;
 using BDVHDLtoNetlist.Block.Signal;
+using BDVHDLtoNetlist.Exceptions;
 using BDVHDLtoNetlist.Parser.Utility;
 using System;
 using System.Collections.Generic;
@@ -37,19 +38,24 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
             for (int i = 0; i < components.Count; ++i)
                 foreach (var portPair in components[i].portMap)
                 {
-                    if (!(portPair.Value is StdLogic))
-                        throw new Exception("Component port must be STD_LOGIC");
-
-                    var netSignal = netMap[(StdLogic)portPair.Value];
                     var chipSignal = componentChip.portNameMappings[i][portPair.Key];
 
+                    if (!(portPair.Value is StdLogic))
+                        throw new CompilerException(
+                            string.Format(@"Port signal ""{0}"" of chip ""{1}"" must be STD_LOGIC",
+                            chipSignal.name, componentChip.chipName));
+
+                    var netSignal = netMap[(StdLogic)portPair.Value];
+
                     if (!chipSignal.attribute.ContainsKey("pin_assign"))
-                        throw new Exception(string.Format("{0}@{1} has no pin assignment", chipSignal, componentChip.componentPrototype.name));
+                        throw new CompilerException(
+                            string.Format(@"Port signal ""{0}"" of chip ""{1}"" does not have attribute ""pin_assignment""",
+                            chipSignal.name, componentChip.chipName));
 
                     netSignal.adjacentNodes.Add(new Node(this, (int)chipSignal.attribute["pin_assign"]));
                 }
 
-            ProcesConstAssign(componentChip.constAssignMappings, this, design, representingNet);
+            ProcesConstAssign(this, design, representingNet);
         }
 
         public NetComponents(
@@ -73,7 +79,10 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                     var netInputSignal = netMap[(StdLogic)gates[i].inputSignals[j]];
                     var chipInputSignal = gateChip.portNameMappings[i][new StdLogic(new SignalName(".in" + j))];
                     if (!chipInputSignal.attribute.ContainsKey("pin_assign"))
-                        throw new Exception(string.Format("{0}@{1}{2} has no pin assignment", chipInputSignal, gateChip.gateType, gateChip.gateWidth));
+                        throw new CompilerException(
+                            string.Format(@"Port signal ""{0}"" of chip ""{1}"" does not have attribute ""pin_assignment""",
+                            chipInputSignal.name, gateChip.chipName));
+
                     netInputSignal.adjacentNodes.Add(new Node(this, (int)chipInputSignal.attribute["pin_assign"]));
                 }
 
@@ -81,20 +90,27 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                 {
                     var chipInputSignal = gateChip.portNameMappings[i][new StdLogic(new SignalName(".in" + j))];
                     if (!chipInputSignal.attribute.ContainsKey("pin_assign"))
-                        throw new Exception(string.Format("{0}@{1}{2} has no pin assignment", chipInputSignal, gateChip.gateType, gateChip.gateWidth));
+                        throw new CompilerException(
+                            string.Format(@"Port signal ""{0}"" of chip ""{1}"" does not have attribute ""pin_assignment""",
+                                chipInputSignal.name, gateChip.chipName));
 
-                    // ゲートの余った入力
-                    if (gateChip.defaultHigh)
+
+            // ゲートの余った入力
+            if (gateChip.defaultHigh)
                     {
                         if (!design.signalTable.ContainsKey("VCC") || !(design.signalTable["VCC"] is StdLogic))
-                            throw new Exception();
+                            throw new CompilerException(
+                            string.Format(@"Signal ""{0}"" was not found in design", "VCC"));
+
                         var vccSignal = (StdLogic)design.signalTable["VCC"];
                         netMap[vccSignal].adjacentNodes.Add(new Node(this, (int)chipInputSignal.attribute["pin_assign"]));
                     }
                     else
                     {
                         if (!design.signalTable.ContainsKey("GND") || !(design.signalTable["GND"] is StdLogic))
-                            throw new Exception();
+                            throw new CompilerException(
+                            string.Format(@"Signal ""{0}"" was not found in design", "GND"));
+
                         var groundSignal = (StdLogic)design.signalTable["GND"];
                         netMap[groundSignal].adjacentNodes.Add(new Node(this, (int)chipInputSignal.attribute["pin_assign"]));
                     }
@@ -102,24 +118,25 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
 
                 var netOutputSignal = netMap[(StdLogic)gates[i].outputSignal];
                 var chipOutputSignal = gateChip.portNameMappings[i][new StdLogic(new SignalName(".out"))];
-
                 if (!chipOutputSignal.attribute.ContainsKey("pin_assign"))
-                    throw new Exception(string.Format("{0}@{1}{2} has no pin assignment", chipOutputSignal, gateChip.gateType, gateChip.gateWidth));
+                    throw new CompilerException(
+                        string.Format(@"Port signal ""{0}"" of chip ""{1}"" does not have attribute ""pin_assignment""",
+                        chipOutputSignal.name, gateChip.chipName));
+
                 netOutputSignal.adjacentNodes.Add(new Node(this, (int)chipOutputSignal.attribute["pin_assign"]));
             }
 
-            ProcesConstAssign(gateChip.constAssignMappings, this, design, representingNet);
+            ProcesConstAssign(this, design, representingNet);
         }
 
         // チップのconst_assignを処理
         void ProcesConstAssign(
-            Dictionary<ISignal, SignalName> constAssignMappings, 
             NetComponents libParts, 
             
             DeclaredObjectContainer design,
             Dictionary<StdLogic, Net> representingNet)
         {
-            foreach (var constAssign in constAssignMappings)
+            foreach (var constAssign in chip.constAssignMappings)
             {
                 Net assignedNet;
 
@@ -132,20 +149,25 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                 {
                     var assignedSignalName = constAssign.Value;
                     if (!design.signalTable.ContainsKey(assignedSignalName.baseName))
-                        throw new Exception();
+                        throw new CompilerException(
+                            string.Format(@"Signal ""{0}"", which is specified in component ""{1}"" is not defined in the design file", 
+                            assignedSignalName.baseName, chip.chipName));
 
                     var assignedSignal = design.signalTable[assignedSignalName];
                     if (!(assignedSignal is StdLogic))
-                        throw new Exception();
+                        throw new CompilerException(
+                            string.Format(@"Signal ""{0}"", which is specified in component ""{1}"" is not std_logic",
+                            assignedSignalName.baseName, chip.chipName));
 
                     assignedNet = representingNet[(StdLogic)assignedSignal];
                 }
 
                 if (!constAssign.Key.attribute.ContainsKey("pin_assign"))
-                    throw new Exception();
+                    throw new CompilerException(
+                        string.Format(@"Port signal ""{0}"" of chip ""{1}"" does not have attribute ""pin_assignment""",
+                        constAssign.Key.name, chip.chipName));
 
                 int portPin = (int)constAssign.Key.attribute["pin_assign"];
-
                 assignedNet.adjacentNodes.Add(new Node(libParts, portPin));
             }
         }

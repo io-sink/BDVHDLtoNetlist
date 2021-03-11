@@ -1,4 +1,5 @@
 ﻿using BDVHDLtoNetlist.Block.Signal;
+using BDVHDLtoNetlist.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace BDVHDLtoNetlist.Block.Chip
 {
     class GateChipDefinition : IChipDefinition
     {
+        public string chipName { get; }
+
         public GateType gateType { get; }
 
         public int gateWidth { get; }
@@ -26,14 +29,15 @@ namespace BDVHDLtoNetlist.Block.Chip
 
         public bool defaultHigh { get { return gateType == GateType.AND || gateType == GateType.NAND; } }
 
-
         private GateChipDefinition(
+            string chipName, 
             GateType gateType, 
             int gateWidth,
             Dictionary<ISignal, ISignal>[] portNameMappings, 
             Dictionary<ISignal, SignalName> constAssignMappings,
             Dictionary<string, object> chipAttribute)
         {
+            this.chipName = chipName;
             this.gateType = gateType;
             this.gateWidth = gateWidth;
             this.portNameMappings = portNameMappings;
@@ -46,13 +50,14 @@ namespace BDVHDLtoNetlist.Block.Chip
             var portNameMappings = new List<Dictionary<ISignal, ISignal>>();
             var constAssignMapping = new Dictionary<ISignal, SignalName>();
 
-            string program = System.IO.File.ReadAllText(fileName);
-            var objects = (new Parser.MyParser()).Parse(program);
+            var objects = (new Parser.MyParser()).Parse(fileName);
 
             if (objects.components.Count > 0 || 
                 objects.componentDeclarations.Count > 1 || 
                 objects.logicGates.Count == 0)
                 return null;
+
+            string chipName = objects.entityPrototype.name;
 
             // チップの入力信号
             var inPortSet = new HashSet<ISignal>(objects.signalTable.Values.Where(
@@ -74,22 +79,26 @@ namespace BDVHDLtoNetlist.Block.Chip
             foreach (var logicGate in objects.logicGates)
             {
                 if (logicGate.gateType != gateType || logicGate.inputSignals.Count != gateWidth)
-                    throw new Exception("");
+                    throw new ChipDefinitionException(fileName, 
+                        string.Format(@"Gate chip ""{0}{1}"" has another gate ""{2}{3}""", 
+                        gateType, gateWidth, logicGate.gateType, logicGate.inputSignals.Count));
 
                 var portNameMap = new Dictionary<ISignal, ISignal>();
 
                 for(int i = 0; i < logicGate.inputSignals.Count; ++i)
                 {
                     if (!inPortSet.Contains(logicGate.inputSignals[i]))
-                        throw new Exception("");
-                    inPortSet.Remove(logicGate.inputSignals[i]);
+                        throw new ChipDefinitionException(fileName,
+                            string.Format("The input signal of the gate must be connected directly to the input port of the chip"));
 
+                    inPortSet.Remove(logicGate.inputSignals[i]);
                     portNameMap.Add(new StdLogic(new SignalName(".in" + i)), logicGate.inputSignals[i]);
                 }
 
                 if (!outPortAssignment.ContainsKey(logicGate.outputSignal) || 
                     !outPortSet.Contains(outPortAssignment[logicGate.outputSignal]))
-                    throw new Exception("");
+                    throw new ChipDefinitionException(fileName, 
+                        string.Format("The output signal of the gate must be connected directly to the output port of the chip"));
 
                 var outPort = outPortAssignment[logicGate.outputSignal];
                 outPortSet.Remove(outPort);
@@ -107,7 +116,7 @@ namespace BDVHDLtoNetlist.Block.Chip
                         constAssignMapping[inPort] = SignalName.Parse((string)constValue);
                 }
 
-            return new GateChipDefinition(gateType, gateWidth, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);
+            return new GateChipDefinition(chipName, gateType, gateWidth, portNameMappings.ToArray(), constAssignMapping, objects.entityAttribute);
         }
 
         public void Print()

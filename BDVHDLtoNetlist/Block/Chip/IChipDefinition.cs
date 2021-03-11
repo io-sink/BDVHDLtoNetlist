@@ -9,6 +9,8 @@ namespace BDVHDLtoNetlist.Block.Chip
 {
     interface IChipDefinition
     {
+        string chipName { get; }
+
         // ゲートのシグナル -> チップのピン
         Dictionary<ISignal, ISignal>[] portNameMappings { get; }
         // チップのピン -> 信号名

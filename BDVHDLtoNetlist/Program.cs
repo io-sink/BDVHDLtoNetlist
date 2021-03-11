@@ -17,11 +17,9 @@ namespace BDVHDLtoNetlist
             // string programFile = @"test01.vhd";
             string chipDefinitionDirectory = @"..\..\library";
 
-            string program = System.IO.File.ReadAllText(programFile);
-            var mainObject = (new Parser.MyParser()).Parse(program);
+            var mainObject = (new Parser.MyParser()).Parse(programFile);
             Console.WriteLine("------ {0} ------", programFile);
             mainObject.Print();
-
 
 
             var chipDefinitions = new List<IChipDefinition>();
@@ -39,7 +37,6 @@ namespace BDVHDLtoNetlist
 
                 Console.WriteLine();
                 Console.WriteLine("------ {0} ------", chipDesignFile);
-                // chipDefinition.Print();
             }
 
 

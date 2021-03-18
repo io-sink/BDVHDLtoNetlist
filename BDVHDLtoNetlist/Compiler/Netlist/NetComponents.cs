@@ -19,6 +19,8 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
         public int id { get; }
         public string name { get { return string.Format("U{0}", this.id); } }
 
+        public string componentName { get; } = "";
+
         private static int count = 0;
 
         public NetComponents(
@@ -34,6 +36,9 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
 
             this.chip = componentChip;
             this.id = ++NetComponents.count;
+
+            if (components.Count() == 1)
+                this.componentName = components[0].name;
 
             for (int i = 0; i < components.Count; ++i)
                 foreach (var portPair in components[i].portMap)
@@ -143,7 +148,7 @@ namespace BDVHDLtoNetlist.Compiler.Netlist
                 if (constAssign.Value.baseName.ToLower() == "open")
                 {
                     var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
-                    assignedNet = representingNet[tempSignal] = new Net();
+                    assignedNet = representingNet[tempSignal] = new Net(".temp");
                 }
                 else
                 {

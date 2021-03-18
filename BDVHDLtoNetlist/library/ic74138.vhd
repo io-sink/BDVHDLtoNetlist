@@ -64,7 +64,7 @@ port (
   attribute pin_assign of Y6N is 9;
   attribute pin_type of Y6N is "output";
   Y7N : out std_logic;
-  attribute pin_assign of Y7N is 8;
+  attribute pin_assign of Y7N is 7;
   attribute pin_type of Y7N is "output"
 	);
 	end ic74138;

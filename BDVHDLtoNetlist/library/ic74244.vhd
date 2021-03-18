@@ -42,16 +42,16 @@ port (
 	attribute pin_assign of GN2 is 19;
 	attribute pin_type of GN2 is "input";
 	A21 : in std_logic;
-	attribute pin_assign of A21 is 11;
+	attribute pin_assign of A21 is 17;
 	attribute pin_type of A21 is "input";
 	A22 : in std_logic;
-	attribute pin_assign of A22 is 13;
+	attribute pin_assign of A22 is 15;
 	attribute pin_type of A22 is "input";
 	A23 : in std_logic;
-	attribute pin_assign of A23 is 15;
+	attribute pin_assign of A23 is 13;
 	attribute pin_type of A23 is "input";
 	A24 : in std_logic;
-	attribute pin_assign of A24 is 17;
+	attribute pin_assign of A24 is 11;
 	attribute pin_type of A24 is "input";
 
   Y11 : out std_logic;
@@ -68,16 +68,16 @@ port (
   attribute pin_type of Y14 is "output";
 
   Y21 : out std_logic;
-  attribute pin_assign of Y21 is 9;
+  attribute pin_assign of Y21 is 3;
   attribute pin_type of Y21 is "output";
   Y22 : out std_logic;
-  attribute pin_assign of Y22 is 7;
+  attribute pin_assign of Y22 is 5;
   attribute pin_type of Y22 is "output";
   Y23 : out std_logic;
-  attribute pin_assign of Y23 is 5;
+  attribute pin_assign of Y23 is 7;
   attribute pin_type of Y23 is "output";
   Y24 : out std_logic;
-  attribute pin_assign of Y24 is 3;
+  attribute pin_assign of Y24 is 9;
   attribute pin_type of Y24 is "output"
 	);
 	end ic74244;

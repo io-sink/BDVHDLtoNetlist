@@ -25,12 +25,15 @@ namespace BDVHDLtoNetlist.Compiler
 
             foreach (ISignal signal in design.signalTable.Values)
                 if (signal is StdLogic)
-                    this.representingNet[(StdLogic)signal] = new Net();
+                    this.representingNet[(StdLogic)signal] = new Net(signal.name.ToString());
                 else if (signal is StdLogicVector) 
                 {
                     var vector = (StdLogicVector)signal;
                     for (int i = 0; i < vector.size; ++i)
-                        this.representingNet[vector.GetLogic(vector.stRange + i)] = new Net();
+                    {
+                        var stdLogic = vector.GetLogic(vector.stRange + i);
+                        this.representingNet[stdLogic] = new Net(stdLogic.name.ToString());
+                    }
                 }
 
             // 代入されたネットの統一
@@ -130,7 +133,7 @@ namespace BDVHDLtoNetlist.Compiler
                             else if(portSignal.Value.mode == SignalMode.OUT || portSignal.Value.mode == SignalMode.INOUT)
                             {
                                 var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
-                                this.representingNet[tempSignal] = new Net();
+                                this.representingNet[tempSignal] = new Net(".temp");
                                 portMap[portSignal.Value] = tempSignal;
                             }
 
@@ -183,7 +186,7 @@ namespace BDVHDLtoNetlist.Compiler
                     for (int i = gatePool.Count; i < gateChips[gateType][gateWidth].gateCount; ++i)
                     {
                         var tempSignal = new StdLogic(design.signalNameGenerator.getSignalName());
-                        this.representingNet[tempSignal] = new Net();
+                        this.representingNet[tempSignal] = new Net(".temp");
                         gatePool.Add(new LogicGate(gateType, groundSignals, tempSignal));
                     }
 

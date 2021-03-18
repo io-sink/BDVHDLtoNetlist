@@ -54,10 +54,10 @@ port (
 	attribute pin_assign of B2 is 10;
 	attribute pin_type of B2 is "input";
 	C2 : in std_logic;
-	attribute pin_assign of C2 is 12;
+	attribute pin_assign of C2 is 11;
 	attribute pin_type of C2 is "input";
 	D2 : in std_logic;
-	attribute pin_assign of D2 is 13;
+	attribute pin_assign of D2 is 12;
 	attribute pin_type of D2 is "input";
 	Y2 : out std_logic;
 	attribute pin_assign of Y2 is 13;

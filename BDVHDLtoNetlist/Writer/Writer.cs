@@ -26,6 +26,7 @@ namespace BDVHDLtoNetlist.Writer
             {
                 var comp = new SExpr("comp");
                 comp.children.AddLast(new SExpr("ref", netComponent.name));
+                comp.children.AddLast(new SExpr("name", netComponent.componentName));
                 comp.children.AddLast(new SExpr("value", (string)netComponent.chip.chipAttribute["component_name"]));
                 comp.children.AddLast(new SExpr("footprint", (string)netComponent.chip.chipAttribute["footprint_name"]));
                 comp.children.AddLast(new SExpr("tstamp", netComponent.id.ToString("X8")));
@@ -68,6 +69,7 @@ namespace BDVHDLtoNetlist.Writer
                 var net = new SExpr("net");
                 net.children.AddLast(new SExpr("code", netSignal.id.ToString()));
                 net.children.AddLast(new SExpr("name", netSignal.name));
+                net.children.AddLast(new SExpr("signal", netSignal.signalName));
 
                 foreach (var netNode in netSignal.adjacentNodes)
                 {

@@ -65,6 +65,7 @@
     <Compile Include="Block\Signal\StdLogic.cs" />
     <Compile Include="Block\Signal\StdLogicVector.cs" />
     <Compile Include="Compiler\Compiler.cs" />
+    <Compile Include="Compiler\ComponentNameComparer.cs" />
     <Compile Include="Compiler\Netlist\NetComponents.cs" />
     <Compile Include="Compiler\Netlist\Net.cs" />
     <Compile Include="Compiler\Netlist\Node.cs" />

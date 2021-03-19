@@ -10,7 +10,7 @@ namespace BDVHDLtoNetlist
     class Program
     {
         static void Main(string[] args)
-        {
+        { 
             // string programFile = args[0];
             string programFile = @"C:\Users\yutar\Documents\HDL_Workspace\core2.1_circuit_diagram\core21.vhd";
 

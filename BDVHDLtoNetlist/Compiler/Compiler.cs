@@ -93,7 +93,6 @@ namespace BDVHDLtoNetlist.Compiler
                     componentQueue[component.prototype] = new List<Component>();
                 componentQueue[component.prototype].Add(component);
             }
-
             foreach (var gate in design.logicGates)
             {
                 if (!gateQueue.ContainsKey(gate.gateType))
@@ -111,6 +110,9 @@ namespace BDVHDLtoNetlist.Compiler
             // コンポーネントのチップを作成
             foreach (var componentPrototype in componentQueue.Keys)
             {
+                componentQueue[componentPrototype].Sort((x, y) => 
+                    (new ComponentNameComparer()).Compare(x.name, y.name));
+
                 while (componentQueue[componentPrototype].Count > 0)
                 {
                     int dequeueCount = Math.Min(componentQueue[componentPrototype].Count, componentChips[componentPrototype].componentCount);
@@ -150,7 +152,6 @@ namespace BDVHDLtoNetlist.Compiler
             {
                 int gateWidth = 0;
                 var gatePool = new List<LogicGate>();
-
                 gateQueue[gateType].Sort((x, y) => y.inputSignals.Count - x.inputSignals.Count);
 
                 foreach (var gate in gateQueue[gateType])

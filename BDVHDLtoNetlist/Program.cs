@@ -11,11 +11,9 @@ namespace BDVHDLtoNetlist
     {
         static void Main(string[] args)
         { 
-            // string programFile = args[0];
-            string programFile = @"C:\Users\yutar\Documents\HDL_Workspace\core2.1_circuit_diagram\core21.vhd";
-
-            // string programFile = @"test01.vhd";
-            string chipDefinitionDirectory = @"..\..\library";
+            string programFile = args[0];
+            string chipDefinitionDirectory = args[1];
+            string outFile = args[2];
 
             var mainObject = (new Parser.MyParser()).Parse(programFile);
             Console.WriteLine("------ {0} ------", programFile);
@@ -60,7 +58,7 @@ namespace BDVHDLtoNetlist
             }
 
 
-            (new Writer.Writer()).Write(compiler, "out.net");
+            (new Writer.Writer()).Write(compiler, outFile);
 
 
             // パーツリストを出力

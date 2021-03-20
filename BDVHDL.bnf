@@ -30,18 +30,12 @@ NAND
 NOR
 XNOR
 
-
-
 <=
 ;
 .
 ,
 
-
-[lexical]
-identifier : 名前
-
-
+identifier
 *)
 
 
@@ -126,12 +120,9 @@ port_association_list ::= port_association_element { , port_association_element 
 generic_association_element ::= name => expression
 port_association_element ::= name => name
 
-expression ::= and_expression | or_expression | xor_expression | nand_expression | nor_expression | xnor_expression
+expression ::= and_expression | or_expression | xor_expression
 and_expression ::= factor { AND factor }
 or_expression ::= factor { OR factor }
 xor_expression ::= factor { XOR factor }
-nand_expression ::= factor { NAND factor }
-nor_expression ::= factor { NOR factor }
-xnor_expression ::= factor { XNOR factor }
 factor ::= primary | NOT primary
 primary ::= name | NUMBER | STRING | ( expression )

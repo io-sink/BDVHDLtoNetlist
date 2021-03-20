@@ -262,13 +262,10 @@ namespace BDVHDLtoNetlist.Parser
             portAssociationList.Rule = MakePlusRule(portAssociationList, sComma, portAssociationElement);
             portAssociationElement.Rule = name + sRArrow + name;
 
-            expression.Rule = andExpression | orExpression | xorExpression | nandExpression | norExpression | xnorExpression;
+            expression.Rule = andExpression | orExpression | xorExpression;
             andExpression.Rule = MakePlusRule(andExpression, sAnd, factor);
             orExpression.Rule = MakePlusRule(orExpression, sOr, factor);
             xorExpression.Rule = MakePlusRule(xorExpression, sXor, factor);
-            nandExpression.Rule = MakePlusRule(nandExpression, sNand, factor);
-            norExpression.Rule = MakePlusRule(norExpression, sNor, factor);
-            xnorExpression.Rule = MakePlusRule(xnorExpression, sXnor, factor);
             factor.Rule = primary | sNot + primary;
             primary.Rule = name | sNumber | sString | sLParen + expression + sRParen;
 

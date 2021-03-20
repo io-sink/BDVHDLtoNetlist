@@ -76,8 +76,7 @@ namespace BDVHDLtoNetlist
                 Console.WriteLine("{0} : {1}", pair.Key.chipAttribute["component_name"], pair.Value);
             Console.WriteLine("sum : {0}", componentList.Values.Sum());
 
-            Console.ReadKey();
-
+            Console.WriteLine("finished.");
         }
     }
 }

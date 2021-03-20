@@ -67,9 +67,9 @@ port (
 architecture logic of ic7400 is 
 begin 
 
-	Y1 <= A1 nand B1;
-	Y2 <= A2 nand B2;
-	Y3 <= A3 nand B3;
-	Y4 <= A4 nand B4;
+	Y1 <= not(A1 and B1);
+	Y2 <= not(A2 and B2);
+	Y3 <= not(A3 and B3);
+	Y4 <= not(A4 and B4);
 
 end logic;

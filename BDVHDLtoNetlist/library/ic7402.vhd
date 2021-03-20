@@ -67,9 +67,9 @@ port (
 architecture logic of ic7402 is 
 begin 
 
-	Y1 <= A1 nor B1;
-	Y2 <= A2 nor B2;
-	Y3 <= A3 nor B3;
-	Y4 <= A4 nor B4;
+	Y1 <= not(A1 or B1);
+	Y2 <= not(A2 or B2);
+	Y3 <= not(A3 or B3);
+	Y4 <= not(A4 or B4);
 
 end logic;

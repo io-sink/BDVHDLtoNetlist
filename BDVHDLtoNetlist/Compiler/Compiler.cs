@@ -110,8 +110,9 @@ namespace BDVHDLtoNetlist.Compiler
             // コンポーネントのチップを作成
             foreach (var componentPrototype in componentQueue.Keys)
             {
+                // コンポネントの名前で降順ソート
                 componentQueue[componentPrototype].Sort((x, y) => 
-                    (new ComponentNameComparer()).Compare(x.name, y.name));
+                    (new ComponentNameComparer()).Compare(y.name, x.name));
 
                 while (componentQueue[componentPrototype].Count > 0)
                 {

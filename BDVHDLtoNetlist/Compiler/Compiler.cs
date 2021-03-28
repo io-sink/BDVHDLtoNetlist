@@ -19,9 +19,12 @@ namespace BDVHDLtoNetlist.Compiler
 
         public List<NetComponents> netComponents { get; set; }
 
+        public Dictionary<IChipDefinition, int> resComponentCount { get; set; }
+
         public void Compile(DeclaredObjectContainer design, List<IChipDefinition> chips)
         {
             this.representingNet = new Dictionary<StdLogic, Net>();
+            this.resComponentCount = new Dictionary<IChipDefinition, int>();
 
             foreach (ISignal signal in design.signalTable.Values)
                 if (signal is StdLogic)
@@ -125,7 +128,9 @@ namespace BDVHDLtoNetlist.Compiler
                         componentQueue[componentPrototype].RemoveAt(componentQueue[componentPrototype].Count - 1);
                     }
 
-                    // 空いた入力ポートをGNDに固定，出力ポートに仮の信号を接続したコンポネントを追加
+                    this.resComponentCount[componentChips[componentPrototype]] = componentChips[componentPrototype].componentCount - dequeueCount;
+
+                    // 余ったコンポネントの入力ポートをGNDに固定，出力ポートに仮の信号を接続
                     for (int i = dequeueCount; i < componentChips[componentPrototype].componentCount; ++i)
                     {
                         var portMap = new Dictionary<ISignal, ISignal>();
@@ -171,6 +176,8 @@ namespace BDVHDLtoNetlist.Compiler
 
                     if(gatePool.Count == gateChips[gateType][gateWidth].gateCount)
                     {
+                        this.resComponentCount[gateChips[gateType][gateWidth]] = 0;
+
                         var parts = new NetComponents(gateChips[gateType][gateWidth], gatePool, this.representingNet, design, this.representingNet);
                         this.netComponents.Add(parts);
 
@@ -184,6 +191,9 @@ namespace BDVHDLtoNetlist.Compiler
                     var groundSignals = new List<ISignal>();
                     for (int i = 0; i < gateWidth; ++i)
                         groundSignals.Add(groundSignal);
+
+
+                    this.resComponentCount[gateChips[gateType][gateWidth]] = gateChips[gateType][gateWidth].gateCount - gatePool.Count;
 
                     for (int i = gatePool.Count; i < gateChips[gateType][gateWidth].gateCount; ++i)
                     {

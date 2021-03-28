@@ -73,7 +73,9 @@ namespace BDVHDLtoNetlist
             Console.WriteLine();
             Console.WriteLine("----- partslist -----");
             foreach (var pair in componentList)
-                Console.WriteLine("{0} : {1}", pair.Key.chipAttribute["component_name"], pair.Value);
+                Console.WriteLine("{0} : {1} (residue : {2})", pair.Key.chipAttribute["component_name"], pair.Value, compiler.resComponentCount[pair.Key]);
+
+            Console.WriteLine("----------");
             Console.WriteLine("sum : {0}", componentList.Values.Sum());
 
             Console.WriteLine("finished.");

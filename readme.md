@@ -1,7 +1,9 @@
 # BDVHDLtoNetlist
 **BDVHDLtoNetlist**は，BDVHDL(独自に定義したVHDLのサブセット)で記述されたネットリストをKiCad(Pcbnew)形式のネットリストに変換するツールです．
-
 BDVHDLはVHDLの文法に一定の制限を加えたものですが，表現力は正規のVHDLと変わらず，一定の制約を守ることでQuartus Primeの回路図エディタから直接生成することができます．
+
+BDVHDLtoNetlist is a software to generate KiCAD Netlist from BDVHDL(VHDL subset) code.
+BDVHDL is as expressive as standard VHDL and can be generated automatically by Quartus Schematic Editor within certain constraints.
 
 ## **BDVHDLtoNetlist**が利用できる場面
 **BDVHDLtoNetlist**は，汎用ロジックICとメモリICのみからCPUを作る自由研究のために実装したものです．
